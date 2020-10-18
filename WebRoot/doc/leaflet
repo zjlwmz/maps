@@ -1,0 +1,10 @@
+
+
+
+Leaflet
+
+ Leaflet默认坐标系是EPSG3857，而天地图使用的投影方式是EPSG4326或者900913。
+ 
+ 
+ 设置坐标系
+ https://blog.csdn.net/dahongdahong/article/details/49685653

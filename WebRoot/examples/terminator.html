@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mapbox Vector Tiles</title>
+    <link rel="stylesheet"
+          href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src='http://momentjs.cn/downloads/moment.js'></script>
+    <script
+            src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+    <script
+            src="https://openlayers.org/en/v4.6.5/examples/resources/mapbox-streets-v6-style.js"></script>
+    <style>
+        .map {
+            background: #f8f4f0;
+        }
+    </style>
+</head>
+<body>
+<div id="map" class="map"></div>
+<script>
+    var map = new ol.Map({
+        layers: [
+            new ol.layer.Tile({
+                source: new ol.source.XYZ({
+                    url: 'https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiemhhbmdqaWFsdSIsImEiOiJjajRvOW44eDcwOGtqMzNxNnFvemQ2ZTlyIn0.i01rCdfpdvooSqkHQBxPBA'
+                })
+            })
+        ],
+        target: 'map',
+        view: new ol.View({
+            center: [0, 0],
+            zoom: 2
+        })
+    });
+</script>
+<script type="text/javascript">
+    $(function (){
+        addDayNightTerminator();
+    })
+</script>
+<script type="text/javascript">
+    function addDayNightTerminator(){
+        var twilightWidth = 667918;
+        var twilightSteps = 13;
+        var points = 288;
+        var maxDimension = ol.proj.get('EPSG:3857').getExtent()[3];
+        var minDimension = ol.proj.get('EPSG:3857').getExtent()[1];
+        this.dayFeatures = [];
+        this.nightFeatures = [];
+        this._terminatorCurveSetCache = {};
+        this._generateTerminatorCurveSet = function(dayOfYear) {
+            offsetX = maxDimension;
+            var declination = 0.40927971 * Math.sin((2 * Math.PI / 365) * (dayOfYear - 81.5));
+            var termFunction = function(lon) {
+                var cosFactor = -Math.cos((lon + offsetX) * (Math.PI / maxDimension));
+                return (2 * maxDimension / Math.PI) * Math.atan(cosFactor / Math.tan(declination));
+            };
+            var lonPrimeFunction = function(t) {
+                return (maxDimension - minDimension) / points;
+            };
+            var latPrimeFunction = function(t) {
+                var aFactor = 2 * maxDimension / Math.PI;
+                var bFactor = offsetX;
+                var cFactor = Math.PI / maxDimension;
+                var dFactor = Math.tan(declination);
+                var cosOperand = ((minDimension + (((maxDimension - minDimension) / points) * t)) + bFactor) * cFactor;
+                return (aFactor / (1 + Math.pow((-Math.cos(cosOperand) / dFactor), 2))) * (Math.sin(cosOperand) / dFactor) * (cFactor * (maxDimension - minDimension)) / points;
+            };
+            var lonParallelFunction = function(dist, t) {
+                return (dist * latPrimeFunction(t)) / Math.sqrt(Math.pow(lonPrimeFunction(t), 2) + Math.pow(latPrimeFunction(t), 2));
+            }
+            var latParallelFunction = function(dist, t) {
+                return (dist * lonPrimeFunction(t)) / Math.sqrt(Math.pow(lonPrimeFunction(t), 2) + Math.pow(latPrimeFunction(t), 2));
+            }
+            var lineCoords = [];
+            for (var i = 0; i < twilightSteps; i++) {
+                lineCoords.push([]);
+            }
+            for (var i = 0; i < points; i++) {
+                var lon = minDimension + ((maxDimension - minDimension) / points * i);
+                var lat = termFunction(lon);
+                lineCoords[0].push([lon, lat]);
+                var latDeg = ol.proj.toLonLat([lon, lat])[1];
+                var latRad = latDeg * Math.PI / 180;
+                var baseDist = (twilightWidth / (twilightSteps - 1)) / Math.cos(latRad);
+                var steps = (twilightSteps - 1) / 2
+                for (var j = 1; j <= steps; j++) {
+                    var dist = baseDist * j;
+                    lineCoords[j].push([lon + lonParallelFunction(dist, i), Math.max(lat - latParallelFunction(dist, i), minDimension)]);
+                    lineCoords[j + steps].push([lon - lonParallelFunction(dist, i), Math.min(lat + latParallelFunction(dist, i), maxDimension)]);
+                }
+            }
+            var dayShimCoord = (declination < 0) ? minDimension : maxDimension;
+            var nightShimCoord = (declination < 0) ? maxDimension : minDimension;
+            return {
+                curves: lineCoords,
+                dayShimCoord: dayShimCoord,
+                nightShimCoord: nightShimCoord
+            };
+        };
+        this.getTerminatorCurveSet = function(dayOfYear) {
+            if (!(dayOfYear in this._terminatorCurveSetCache)) {
+                this._terminatorCurveSetCache[dayOfYear] = this._generateTerminatorCurveSet(dayOfYear);
+            }
+            return $.extend(true, {}, this._terminatorCurveSetCache[dayOfYear]);
+        };
+        this.setClock = function(clock) {
+            var now = moment.unix(clock).utc();
+            var baseCurveData = this.getTerminatorCurveSet(now.dayOfYear());
+            var dayFraction = (now.hour() * 3600 + now.minute() * 60 + now.second()) / 86400;
+            var offsetX = dayFraction * 2 * maxDimension;
+            offsetX = Math.round(offsetX / ((2 * maxDimension) / points)) * ((2 * maxDimension) / points);
+            $.each(baseCurveData.curves, $.proxy(function(k1, curve) {
+                $.each(curve, function(k2, coord) {
+                    curve[k2][0] -= offsetX;
+                });
+                var count = 0;
+                while (true) {
+                    if (count > curve.length) {
+                        break;
+                    }
+                    if (curve[0][0] < minDimension) {
+                        var coord = curve.shift();
+                        coord[0] += (maxDimension - minDimension);
+                        curve.push(coord);
+                    } else {
+                        break;
+                    }
+                    count++;
+                }
+                curve.push([curve[0][0] + (maxDimension - minDimension), curve[0][1]]);
+                var nightCoords = curve.slice(0);
+                nightCoords.push([maxDimension, baseCurveData.nightShimCoord], [minDimension, baseCurveData.nightShimCoord], curve[0]);
+                /*$.each(nightCoords, function(i, coord) {                  //如果地图是4326坐标系，需要在这里转化
+                    nightCoords[i] = ol.proj.transform(nightCoords[i],'EPSG:3857','EPSG:4326')
+                });*/
+
+                var newnightCoords =[];
+                $.each(nightCoords, function(i, coord) {
+                    var night= ol.proj.transform(nightCoords[i],'EPSG:3857','EPSG:4326');
+                    newnightCoords.push(night);
+                });
+                console.log(newnightCoords);
+
+                var nightGeometry = new ol.geom.Polygon([nightCoords]);
+                this.nightFeatures[k1].setGeometry(nightGeometry);
+            }, this));
+        };
+        for (var i = 0; i < twilightSteps; i++) {
+            this.nightFeatures.push(new ol.Feature({
+                type: 'night'
+            }));
+        }
+        this.setClock(Math.round(new Date().getTime()/1000));//设置时间，不设置则为当前时间 '2017-03-22 12:00'
+
+        var twilightLayer = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                features: [].concat(this.nightFeatures)
+            }),
+            opacity:0.1,
+            style:new ol.style.Style({
+                fill: new ol.style.Fill({
+                    color: 'rgba(0,0,0,0.4)'
+                })
+            })
+        });
+        map.addLayer(twilightLayer);
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+
+/**
+ * 
+ */
+var drawLayer=null;
+
+
+

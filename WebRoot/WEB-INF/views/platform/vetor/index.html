@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>postgis 矢量切片</title>
+	
+    <meta name="keywords" content="keyword1,keyword2,keyword3">
+    <meta name="description" content="this is my page">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="${base!}/static/plugins/jquery/jquery-1.8.2.min.js"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js'></script>
+	<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css' rel='stylesheet' />
+	
+	<style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+  </head>
+  
+  <body>
+   	<div id='map'></div>
+    <script>
+    	$(document).ready(function(){
+    		mapboxgl.accessToken = "pk.eyJ1IjoiemhhbmdqaWFsdSIsImEiOiJjajRvOW44eDcwOGtqMzNxNnFvemQ2ZTlyIn0.i01rCdfpdvooSqkHQBxPBA";
+	        var tileset = 'mapbox.streets';
+	        var map = new mapboxgl.Map({
+	            container: 'map',
+	            zoom: 12,
+	            center: [117.2474670, 39.1236683],
+	            style: 'mapbox://styles/mapbox/light-v9',
+	            hash: false
+	        });
+	
+	        map.on('load', function loaded() {
+	            map.addSource('custom-go-vector-tile-source', {
+	                type: 'vector',
+	                tiles: ['http://localhost:8080/Dmap/api/title/getTitle/{z}/{x}/{y}']
+	            });
+	            map.addLayer({
+	                id: 'background',
+	                type: 'background',
+	                paint: {
+	                    'background-color': 'white'
+	                }
+	            });
+	            map.addLayer({
+	                "id": "custom-go-vector-tile-layer",
+	                "type": "circle",
+	                "source": "custom-go-vector-tile-source",
+	                "source-layer": "points",
+	                paint: {
+	                    'circle-radius': {
+	                        stops: [
+	                            [8, 0.1],
+	                            [11, 0.5],
+	                            [15, 3],
+	                            [20, 20]
+	                        ]
+	                    },
+	                    'circle-color': 'red',
+	                    'circle-opacity': 1
+	                }
+	            });
+	        });
+    	});
+        
+    </script>
+  </body>
+</html>

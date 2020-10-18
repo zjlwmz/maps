@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>地图查询</title>
+<meta http-equiv="Access-Control-Allow-Origin" content="*">
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="this is my page">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="${base!}/static/plugins/layui-v2.4.3/layui/css/layui.css" type="text/css"></link>
+<link rel="stylesheet" href="${base!}/static/css/common.css?t=1.01" type="text/css"></link>
+<link rel="stylesheet" href="${base!}/static/plugins/leaflet/leaflet.css" type="text/css"></link>
+<link rel="stylesheet" href="${base!}/static/plugins/leaflet-plug/Leaflet.MousePosition-master/src/L.Control.MousePosition.css" type="text/css"></link>
+<link rel="stylesheet" href="${base!}/static/css/maps.css?t=1.57" type="text/css"></link>
+
+
+
+<script type="text/javascript" src="${base!}/static/plugins/utils/GPS.js"></script>
+<script type="text/javascript" src="${base!}/static/plugins/layui-v2.4.3/layui/layui.js"></script>
+<script type="text/javascript" src="${base!}/static/plugins/leaflet/leaflet.js"></script>
+<script type="text/javascript" src="${base!}/static/plugins/leaflet-plug/Leaflet.MousePosition-master/src/L.Control.MousePosition.js"></script>
+
+
+<link rel="stylesheet" href="${base!}/static/plugins/leaflet-plug/Leaflet.draw-0.4.14/leaflet.draw-src.css" type="text/css"></link>
+<script type="text/javascript" src="${base!}/static/plugins/leaflet-plug/Leaflet.draw-0.4.14/leaflet.draw-src.js?t=1.01"></script>
+
+<script type="text/javascript" src="${base!}/static/plugins/map-search/config.js"></script>
+<script type="text/javascript" src="${base!}/static/plugins/map-search/mapServerUtils.js?t=1.23"></script>
+
+<script type="text/javascript" src="${base!}/static/plugins/map-search/postgisTools.js?t=1.50720"></script>
+
+<script type="text/javascript">var baseUrl="${base!}"</script>
+
+<style type="text/css">
+#plotting-container{
+	position: absolute;
+    bottom: 70px;
+    left: 0px;
+    height: 500px;
+    width: 300px;
+    z-index: 1000;
+    background-color: white;
+    border: 1px solid #989898;
+    padding:5px;
+}
+</style>
+
+</head>
+<body>
+	<div id="id_search" class="layui-row">
+		<div class="layui-col-md9">
+			<input id="search" type="text" name="title" required  lay-verify="required" placeholder="若输入经纬度，注意【纬度在前，经度在后】" autocomplete="off" class="layui-input">
+		</div>
+		<div class="layui-col-md1">
+			<div class="route"></div>
+		</div>
+		<div class="layui-col-md2">
+			<button id="button_search" class="layui-btn" lay-submit lay-filter="formDemo">查询</button>
+		</div>
+	</div>
+	<div id="tips"></div>
+	
+	<div id="id_location">
+		<div class="layui-tab layui-tab-brief" lay-filter="direction-tab">
+		  <ul class="layui-tab-title">
+		  	<li class="direction driving layui-this">驾车</li>
+		    <li class="direction walking">步行</li>
+		    <li class="direction bicycling">骑行</li>
+		  </ul>
+		  <div class="layui-tab-content">
+		  	<div class="layui-tab-item layui-show">
+		  		<div class="start layui-row">
+		  			<input id="startLocation" type="text" name="title" required  lay-verify="required" placeholder="输入起点" autocomplete="off" class="layui-input" />
+		  			<div class="input-clear" title="清空"></div>
+		  		</div>
+		  		<div class="end layui-row">
+		  			<input id="endLocation" type="text" name="title" required  lay-verify="required" placeholder="输入起点" autocomplete="off" class="layui-input" />
+		  			<div class="input-clear" title="清空"></div>
+		  		</div>
+		  	</div>
+		  </div>
+		</div>
+		
+		<div id= "route-list">
+			
+		</div>
+	</div>
+	
+	<div id="id_weather">
+		<div class="navigation-div">
+			<text id="weather_color" class="weather"></text>
+			 <br> 
+			<text id="weather_color" class="temperature"></text>
+		</div>
+	</div>
+	
+	<div id="plotting-container">
+		<form class="layui-form" action="">
+			<input type="hidden" name="geojson" id="geojson"/>
+			<div class="layui-row">
+				<div class="layui-form-item">
+				    <label class="layui-form-label" style="width: 50px;">选中数据</label>
+				    <div class="layui-input-block">
+				      <select name="a" id="p1" lay-filter="aihao">
+				        <option value=""></option>
+				      </select>
+				    </div>
+				</div>
+			</div>
+			
+			<div class="layui-row">
+				<div class="layui-form-item">
+				    <label class="layui-form-label" style="width: 50px;">选中数据</label>
+				    <div class="layui-input-block">
+				      <select name="b" id="p2" lay-filter="aihao">
+				        <option value=""></option>
+				      </select>
+				    </div>
+				</div>
+			</div>
+			
+			
+			<div class="layui-row">
+				<div class="layui-form-item">
+				    <label class="layui-form-label"  style="width: 50px;">处理函数</label>
+				    <div class="layui-input-block">
+				      <select name="methond" id="methond" lay-filter="aihao">
+				        <option value="">请选择</option>
+				        <option value="ST_StartPoint">获取线的起始点</option>
+				        <option value="ST_EndPoint">获取线的终点</option>
+				        <option value="ST_Centroid">对象的中心点</option>
+				        <option value="Arc_Midpoint">求弧线中点</option>
+				        
+				        <option value="ST_Dump">multipolygon2polygon</option>
+				        <option value="ST_Boundary">获取边界</option>
+				        <option value="ST_MakeLine">合成线</option>
+				        <option value="get_circle">获取圆的多边形</option>
+				        <option value="ST_Buffer">缓冲区</option>
+				        <option value="ST_LineMerge">多线合并单线</option>
+				        <option value="ST_Intersection">相交的部分</option>
+				        <option value="ST_SymDifference">不相交的部分</option>
+				      </select>
+				    </div>
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+			    <label class="layui-form-label">名称</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="name" lay-verify="title" id="name" autocomplete="off" placeholder="名称" class="layui-input">
+			    </div>
+			</div>
+  
+			<div class="layui-row" style="text-align: center;">
+		  			<button class="layui-btn" lay-submit lay-filter="form_relation">执行</button>
+		  			<button class="layui-btn" lay-submit lay-filter="form_save_relation">保存结果</button>
+		  	</div>
+		</form>
+		
+		<div id="result-postgis"></div>
+	</div>
+	
+	<div id=map></div>
+</body>
+
+</html>

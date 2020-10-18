@@ -1,0 +1,60 @@
+
+
+#返回圆的多边形
+select st_asgeojson(st_buffer(geom, radius)) from gis_area where id='101'
+
+
+
+圆与矩形相交部分：
+with get_cicle as (
+	SELECT * from gis_area where id='200'
+),
+get_rect as (
+	SELECT * from gis_area where id='100'
+),
+get_cicle_rect_jiaoji as(
+	select ST_Intersection(t1.geom,t2.geom) as geom from get_cicle t1 ,get_rect t2
+)
+select st_asgeojson(geom) from get_cicle_rect_jiaoji
+
+
+圆与矩形不相交部分
+with get_cicle as (
+	SELECT * from gis_area where id='210'
+),
+get_rect as (
+	SELECT * from gis_area where id='100'
+),
+get_cicle_rect_jiaoji as(
+	select ST_SymDifference(t1.geom,t2.geom) as geom from get_cicle t1 ,get_rect t2
+)
+select st_asgeojson(geom) from get_cicle_rect_jiaoji
+
+
+圆与矩形相交的边界线
+
+{"type":"MultiLineString","coordinates":[[[111.17584317127,35.108366],[111.175507414076,35.104957]],[[111.175512338646,35.111725],[111.17584317127,35.108366]]]}
+
+Multi类型不好处理
+
+
+
+求：
+一个多边形面与圆相交部分 为一段弧线
+多边形为D1
+圆为C
+
+1、获取俩个面相交部分  获取两个几何对象相交的部分 ST_Intersection(geometry, geometry)
+	C与D1 相交部分为A
+2、获取不相交部分   获取两个几何对象不相交的部分（A、B可互换） ST_SymDifference(geometry A, geometry B)
+	D1与A不相交部分为B
+3、A与B的相交部分为弧线arc1
+   C与D相交交点为 (px1,py1), (px2,py2)
+
+4、求两点构成方位角
+   (x0,y0)与(px1,pyx) 角度ang1
+   (x0,y0)与(px2,py2) 角度ang2
+5、|ang1-ang2|角度差绝对值 ang_arc
+
+6、根据角度 1/2*ang_arc 求弧线的中点
+

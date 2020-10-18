@@ -1,0 +1,83 @@
+
+
+根据经纬度点计算在地球曲面上的距离，单位米，地球半径取值6370986米 
+ST_distance_sphere(point, point)
+
+
+SELECT st_asgeojson(geom) from geo_plotting where id='48'
+
+
+{"type":"LineString","coordinates":[[120.414117,41.574668],[120.414693,41.57468]]}
+
+
+
+
+距离
+SELECT st_distance(st_transform(st_geometryfromtext('POINT(120.414117 41.574668)',4326),4527),
+st_transform(st_geometryfromtext('POINT(120.414693 41.57468)',4326),4527));
+
+
+面积
+SELECT st_area(ST_Transform(st_geometryfromtext('POLYGON((116.4679312706 39.9482801227,116.4677961543 39.9486461337,116.4680989087 39.9486998528,116.4682182670 39.9483181633,116.4679312706 39.9482801227))',4326),4527));
+
+
+
+SELECT st_area(ST_Transform(geom,4527)) from geo_plotting where id='67'
+
+
+
+#方法简介
+geometry ST_LineMerge(geometry amultilinestring);
+
+
+
+
+
+
+
+CREATE TABLE "data"."geo_plotting" (
+  "id" varchar(36) COLLATE "pg_catalog"."default" NOT NULL,
+  geom GEOMETRY(geometry, 4326),
+  "name" varchar(255) COLLATE "pg_catalog"."default",
+  "geojson" text COLLATE "pg_catalog"."default",
+  "properties" text COLLATE "pg_catalog"."default",
+  "type" varchar(36) COLLATE "pg_catalog"."default",
+  "radius" float4,
+  "lat_lngs" text COLLATE "pg_catalog"."default",
+  "remarks" varchar(255) COLLATE "pg_catalog"."default",
+  CONSTRAINT "geo_plotting_pkey" PRIMARY KEY ("id")
+)
+;
+
+ALTER TABLE "data"."geo_plotting" 
+  OWNER TO "postgres";
+  
+  
+  
+  
+  CREATE TABLE "data"."geo_data" (
+  "id" varchar(36) COLLATE "pg_catalog"."default" NOT NULL,
+    geom GEOMETRY(geometry, 4326),
+    "name" varchar(255),
+    "geojson" text,
+    "properties" text,
+    "show" varchar(36),
+  CONSTRAINT "geo_data_test2_pkey" PRIMARY KEY ("id")
+)
+;
+
+ALTER TABLE "data"."geo_data" 
+  OWNER TO "postgres”;
+  
+  
+  
+  
+  
+求 圆缓冲区
+
+SELECT st_asgeojson(ST_Transform(ST_Buffer(ST_Transform(geom,4527),22.862),4326)) from data.geo_plotting where id='12'
+
+
+
+  
+  

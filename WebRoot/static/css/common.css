@@ -1,0 +1,10 @@
+html,body,div,ul,li,img,p,form,span,strong,hr,h1,h2,h3,h4,h5,h6,dl,dt,dd,ol{
+	margin: 0px;
+	padding: 0px;
+	font-size: 12px;
+	font-family: "arial, Arial, 'Microsoft Yahei', '微软雅黑', '华文细黑', '宋体', '新宋体', Tahoma, Helvetica";
+}
+
+html, body {
+	height: 100%;
+}

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>商圈页面</title>
+    <meta name="keywords" content="keyword1,keyword2,keyword3">
+    <meta name="description" content="this is my page">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    
+    <link rel="stylesheet" href="${base!}/static/plugins/layui-v2.4.3/layui/css/layui.css" type="text/css"></link>
+    
+    <script type="text/javascript" src="${base!}/static/plugins/layui-v2.4.3/layui/layui.js"></script>
+    
+	<link rel="stylesheet" href="${base!}/static/plugins/leaflet/leaflet.css" type="text/css"></link>
+	<script type="text/javascript" src="${base!}/static/plugins/leaflet/leaflet.js"></script>
+	
+	<script type="text/javascript" src="${base!}/static/plugins/shop/shop.js?t=1.20"></script>
+	<script type="text/javascript">var baseUrl="${base!}";</script>
+	<style type="text/css">
+		#layui-container{
+			position: absolute;
+			top: 0px;
+			background: white;
+			z-index: 100000;
+			width: 350px;
+		}
+		
+		
+		.etters_block .letters {
+		    float: left;
+		    width: 56px;
+		    height: 14px;
+		    margin: 6px 0 0 -70px;
+		    background-color: #EBEBEB;
+		    color: #666;
+		    line-height: 14px;
+		    text-align: center;
+		}
+		
+		.letters {
+		    float: none;
+		    display: block;
+		    margin: 0 0 4px;
+		}
+		
+		
+		.layui-form-checkbox{
+			width: 152px;
+		    overflow: hidden;
+		    text-overflow: ellipsis;
+		    white-space: nowrap;
+		}
+		
+		#city_zone_new_list{
+			height: 793px;
+    		overflow: auto;
+		}
+		
+		
+		
+		.you-tooltip{
+    		border: 1px solid #40c057;
+    		border-radius: 20px;
+    		font-size:12px;
+    		padding:2px;
+    		color:white;
+    		background-color: #40c057;
+		}
+		.liang-tooltip{
+    		border: 1px solid #f7da64;
+    		border-radius: 20px;
+    		font-size:12px;
+    		padding:2px;
+    		color:white;
+    		background-color: #f7da64;
+		}
+		.qingwei-tooltip{
+    		border: 1px solid #f29e39;
+    		border-radius: 20px;
+    		font-size:12px;
+    		padding:2px;
+    		color:white;
+    		background-color: #f29e39;
+		}
+		.qingdu-tooltip{
+    		border: 1px solid #f29e39;
+    		border-radius: 20px;
+    		font-size:12px;
+    		padding:2px;
+    		color:white;
+    		background-color: #f29e39;
+		}
+		.zhongdu-tooltip{
+    		border: 1px solid #da555d;
+    		border-radius: 20px;
+    		font-size:12px;
+    		padding:2px;
+    		color:white;
+    		background-color: #da555d;
+		}
+		.zdzwr-tooltip{
+    		border: 1px solid #b9377a;
+    		border-radius: 20px;
+    		font-size:12px;
+    		padding:2px;
+    		color:white;
+    		background-color: #b9377a;
+		}
+		.zdwr-tooltip{
+    		border: 1px solid #881326;
+    		border-radius: 20px;
+    		font-size:12px;
+    		padding:2px;
+    		color:white;
+    		background-color: #881326;
+		}		
+		.anim-tooltip{
+    		border: 1px solid #66C903;
+    		border-radius: 20px;
+    		font-size:12px;
+    		padding:2px;
+    		color:white;
+    		background-color: #66C903;
+		}
+		
+		#city-list{
+			position: absolute;
+    		z-index: 10000;
+    		top: 10px;
+    		left: 10px;
+		}
+		.city.layui-btn{
+			padding: 0 20px;
+		    line-height: 30px;
+		    height: 30px;
+		}
+	</style>
+  </head>
+  
+  <body>
+    <div id="city-list"><button type="button" class="city layui-btn">长春市</button><button type="button" class="city layui-btn layui-btn-primary">沈阳市</button></div>
+  	<div id="map"></div>
+  </body>
+  <script>
+      var _hmt = _hmt || [];
+      (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?24da07f54fda02deafb9c7427284f8f0";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+      })();
+  </script>
+
+</html>
