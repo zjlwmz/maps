@@ -136,7 +136,8 @@ public interface PlottingService extends BaseService<Plotting>{
 	
 	/**
 	 * 获取缓冲区面多边形
-	 * @param a
+	 * @param geojsonA
+	 * @param raduis
 	 * @return
 	 */
 	String postgisHandleCircleOneGeojson(String geojsonA,Double raduis);
@@ -145,6 +146,7 @@ public interface PlottingService extends BaseService<Plotting>{
 	/**
 	 * 几何对象处理函数【单个几何对象】
 	 * @param geojsonA
+	 * @param value
 	 * @param methond
 	 * @return
 	 */
@@ -153,6 +155,7 @@ public interface PlottingService extends BaseService<Plotting>{
 	/**
 	 * 几何对象处理函数【两个几何对象】
 	 * @param geojsonA
+	 * @param geojsonB
 	 * @param methond
 	 * @return
 	 */
@@ -161,14 +164,15 @@ public interface PlottingService extends BaseService<Plotting>{
 	
 	/**
 	 * 两点距离计算
+	 * @param geojsonA
+	 * @param geojsonB
 	 */
 	double postgisHandleDistanceFunctionTwoGeojson(String geojsonA,String geojsonB);
 	
 	
 	/**
 	 * 多面转单面
-	 * @param a
-	 * @param b
+	 * @param geojsonA
 	 * @return
 	 */
 	List<GeojsonResultDTO> postgisMultipolygon2polygon(String geojsonA);
