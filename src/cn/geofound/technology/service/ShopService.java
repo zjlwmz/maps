@@ -9,5 +9,5 @@ import cn.geofound.technology.entity.Shop;
 
 public interface ShopService extends BaseService<Shop>{
 
-	public List<Record>findShopList(String city);
+	List<Record>findShopList(String city);
 }

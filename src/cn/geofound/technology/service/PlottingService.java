@@ -17,7 +17,7 @@ public interface PlottingService extends BaseService<Plotting>{
 	 * @param plotting
 	 * @return
 	 */
-	public Plotting insertPlotting(Plotting plotting,String geojson);
+	Plotting insertPlotting(Plotting plotting,String geojson);
 	
 	
 	/**
@@ -25,34 +25,34 @@ public interface PlottingService extends BaseService<Plotting>{
 	 * @param plotting
 	 * @return
 	 */
-	public int updatePlotting(Plotting plotting,String geojson);
+	int updatePlotting(Plotting plotting,String geojson);
 	
 	
 	/**
 	 * 标绘列表查询
 	 * @return
 	 */
-	public List<Plotting>findListPlotting();
+	List<Plotting>findListPlotting();
 	
 	/**
 	 * 删除
 	 * @param id
 	 * @return
 	 */
-	public int deleteById(String id);
+	int deleteById(String id);
 	
 	/**
 	 * 获取标绘对象
 	 * @param id
 	 * @return
 	 */
-	public Plotting getPlottingById(String id);
+	Plotting getPlottingById(String id);
 	
 	/**
 	 * 关系函数 postgis
 	 * @return
 	 */
-	public Boolean relationPostgisFunction(String id1,String id2,String function);
+	Boolean relationPostgisFunction(String id1,String id2,String function);
 	
 	
 	
@@ -60,7 +60,7 @@ public interface PlottingService extends BaseService<Plotting>{
 	 * 几何对象处理函数 postgis
 	 * @return
 	 */
-	public Plotting processingPostgisFunction(String id1,String id2,String function);
+	Plotting processingPostgisFunction(String id1,String id2,String function);
 
 
 	/**
@@ -68,14 +68,14 @@ public interface PlottingService extends BaseService<Plotting>{
 	 * @param a
 	 * @return
 	 */
-	public Plotting getCircle(String a);
+	Plotting getCircle(String a);
 	
 	/**
 	 * 几何对象处理函数 【缓冲区】
 	 * @param a
 	 * @return
 	 */
-	public Plotting processingBufferPostgis(String a,Double raduis);
+	Plotting processingBufferPostgis(String a,Double raduis);
 	
 	
 	/**
@@ -83,17 +83,17 @@ public interface PlottingService extends BaseService<Plotting>{
 	 * @param a
 	 * @return
 	 */
-	public Plotting processingLineMergePostgis(String a);
+	Plotting processingLineMergePostgis(String a);
 	
 	/**
 	 * 几何函数存取函数
 	 */
-	public Plotting accessFunctionPostgis(String id,String methond);
+	Plotting accessFunctionPostgis(String id,String methond);
 	
 	/**
 	 * 几何函数存取函数
 	 */
-	public Plotting accessFunctionPostgis(String a,String b,String methond);
+	Plotting accessFunctionPostgis(String a,String b,String methond);
 	
 	
 	/**
@@ -101,7 +101,7 @@ public interface PlottingService extends BaseService<Plotting>{
 	 * 已知两点坐标，求直线方程、距离其中一点距离为L的某点
 	 * 已知直线方程式、求距离为d的坐标点
 	 */
-	public Plotting getLinearEquationAndDistince(String a,String b);
+	Plotting getLinearEquationAndDistince(String a,String b);
 
 	/**
 	 * 多面转单面
@@ -109,7 +109,7 @@ public interface PlottingService extends BaseService<Plotting>{
 	 * @param b
 	 * @return
 	 */
-	public List<Plotting> multipolygon2polygon(String id);
+	List<Plotting> multipolygon2polygon(String id);
 	
 	
 	
@@ -122,7 +122,7 @@ public interface PlottingService extends BaseService<Plotting>{
 	 * @param methond
 	 * @return
 	 */
-	public Boolean postgisRelationFunctionBygeojson(String geojsonA,String geojsonB,String methond);
+	Boolean postgisRelationFunctionBygeojson(String geojsonA,String geojsonB,String methond);
 	
 
 	/**
@@ -131,7 +131,7 @@ public interface PlottingService extends BaseService<Plotting>{
 	 * @param methond
 	 * @return
 	 */
-	public String postgisHandleFunctionOneGeojson(String geojsonA,String methond);
+	String postgisHandleFunctionOneGeojson(String geojsonA,String methond);
 	
 	
 	/**
@@ -139,7 +139,7 @@ public interface PlottingService extends BaseService<Plotting>{
 	 * @param a
 	 * @return
 	 */
-	public String postgisHandleCircleOneGeojson(String geojsonA,Double raduis);
+	String postgisHandleCircleOneGeojson(String geojsonA,Double raduis);
 	
 	
 	/**
@@ -148,7 +148,7 @@ public interface PlottingService extends BaseService<Plotting>{
 	 * @param methond
 	 * @return
 	 */
-	public String postgisHandleFunctionOneGeojson(String geojsonA,Object value,String methond);
+	String postgisHandleFunctionOneGeojson(String geojsonA,Object value,String methond);
 	
 	/**
 	 * 几何对象处理函数【两个几何对象】
@@ -156,13 +156,13 @@ public interface PlottingService extends BaseService<Plotting>{
 	 * @param methond
 	 * @return
 	 */
-	public String postgisHandleFunctionTwoGeojson(String geojsonA,String geojsonB,String methond);
+	String postgisHandleFunctionTwoGeojson(String geojsonA,String geojsonB,String methond);
 	
 	
 	/**
 	 * 两点距离计算
 	 */
-	public double postgisHandleDistanceFunctionTwoGeojson(String geojsonA,String geojsonB);
+	double postgisHandleDistanceFunctionTwoGeojson(String geojsonA,String geojsonB);
 	
 	
 	/**
@@ -171,7 +171,7 @@ public interface PlottingService extends BaseService<Plotting>{
 	 * @param b
 	 * @return
 	 */
-	public List<GeojsonResultDTO> postgisMultipolygon2polygon(String geojsonA);
+	List<GeojsonResultDTO> postgisMultipolygon2polygon(String geojsonA);
 	
 	
 	
@@ -179,20 +179,20 @@ public interface PlottingService extends BaseService<Plotting>{
 	 * 几何数据拆分
 	 * 如使用线拆分成俩个面
 	 */
-	public List<Plotting>postgisGeometrySplit(String geojsonA,String goejsonB);
+	List<Plotting>postgisGeometrySplit(String geojsonA,String goejsonB);
 	
 	/**
 	 * 经纬度2墨卡托
 	 * @param geojsonA
 	 * @return
 	 */
-	public String latlngs2Mercator(String geojsonA);
+	String latlngs2Mercator(String geojsonA);
 	
 	
 	/**
 	 * 墨卡托转经纬度
 	 */
-	public String mercator2Latlngs(String geojsonA);
+	String mercator2Latlngs(String geojsonA);
 
 	
 }

@@ -18,5 +18,5 @@ public interface RoleService  extends BaseService<Role>{
 	 * @param roleId
 	 * @return
 	 */
-	public List<Menu>findMenuList(String roleId);
+	List<Menu>findMenuList(String roleId);
 }
