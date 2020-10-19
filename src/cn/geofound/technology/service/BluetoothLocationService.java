@@ -12,7 +12,7 @@ public interface BluetoothLocationService {
 	 * 蓝牙定位
 	 * @return
 	 */
-	public String location();
+	String location();
 	
 	/**
 	 * 蓝牙定位 [一个蓝牙设备]
@@ -22,7 +22,7 @@ public interface BluetoothLocationService {
 	 * @param effectiveArea1 蓝牙1的有效区域geojson
 	 * @return
 	 */
-	public String location(Double beacon1x,Double beacon1y,Double d1,String effectiveArea1);
+	String location(Double beacon1x,Double beacon1y,Double d1,String effectiveArea1);
 	
 	/**
 	 * 蓝牙定位 [两个蓝牙设备]
@@ -31,7 +31,7 @@ public interface BluetoothLocationService {
 	 * @param d1 探测人距离蓝牙的距离
 	 * @return
 	 */
-	public String location(Double beacon1x,Double beacon1y,Double d1,String effectiveArea1,Double beacon2x,Double beacon2y,Double d2,String effectiveArea2);
+	String location(Double beacon1x,Double beacon1y,Double d1,String effectiveArea1,Double beacon2x,Double beacon2y,Double d2,String effectiveArea2);
 	
 	
 	
@@ -42,5 +42,5 @@ public interface BluetoothLocationService {
 	 * @param d1 探测人距离蓝牙的距离
 	 * @return
 	 */
-	public String location(Double beacon1x,Double beacon1y,Double d1,String effectiveArea1,Double beacon2x,Double beacon2y,Double d2,String effectiveArea2,Double beacon3x,Double beacon3y,Double d3,String effectiveArea3);
+	String location(Double beacon1x,Double beacon1y,Double d1,String effectiveArea1,Double beacon2x,Double beacon2y,Double d2,String effectiveArea2,Double beacon3x,Double beacon3y,Double d3,String effectiveArea3);
 }
