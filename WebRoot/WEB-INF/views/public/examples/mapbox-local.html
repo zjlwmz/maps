@@ -35,34 +35,6 @@
         $("#map").css("height",height+"px");
         mapboxgl.accessToken = 'pk.eyJ1IjoiemhhbmdqaWFsdSIsImEiOiJjajRvOW44eDcwOGtqMzNxNnFvemQ2ZTlyIn0.i01rCdfpdvooSqkHQBxPBA';
 
-        // var map = new mapboxgl.Map({
-        //     container: 'map', // container id
-        //     style:{
-        //         "version": 8,
-        //         "name": "Mapbox Streets",
-        //         "sprite": "mapbox://sprites/mapbox/streets-v8",
-        //         "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
-        //         "sources": {
-        //             "osm-tiles": {
-        //                 "type": "raster",
-        //                 "tiles": [
-        //                     "http://c.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        //                 ],
-        //                 "tileSize": 256
-        //             }
-        //         },
-        //         "layers":[{
-        //             "id": "123",
-        //             "type": "raster",
-        //             "source": "osm-tiles",
-        //             "source-layer": "osmtiles"
-        //         }]
-        //     },
-        //     center: [108.88528000286792,34.24159764118536], // starting position [lng, lat]
-        //     zoom: 16 // starting zoom
-        // });
-
-
         var map = new mapboxgl.Map({
             container: 'map', // container id
             style:{
