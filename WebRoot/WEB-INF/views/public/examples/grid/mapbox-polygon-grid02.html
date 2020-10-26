@@ -31,29 +31,28 @@
         // https://gist.github.com/ryanbaumann/a7d970386ce59d11c16278b90dde094d
             'type': 'geojson',
             'data':
+                '${base!}/examples/testdata/jxm_grid_1000_4326.geojson'
+        });
+
+        map.addSource('jxm', {
+            'type': 'geojson',
+            'data':
                 '${base!}/examples/testdata/jxm_thematic2.geojson'
         });
-        map.addLayer({
-            'id': 'room-extrusion',
-            'type': 'fill-extrusion',
-            'source': 'floorplan',
-            'paint': {
-                // See the Mapbox Style Specification for details on data expressions.
-                // https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions
 
-                // Get the fill-extrusion-color from the source 'color' property.
-                'fill-extrusion-color': ['get', 'color'],
-
-                // Get fill-extrusion-height from the source 'height' property.
-                'fill-extrusion-height': ['get', 'height'],
-
-                // Get fill-extrusion-base from the source 'base_height' property.
-                'fill-extrusion-base': ['get', 'base_height'],
-
-                // Make extrusions slightly opaque for see through indoor walls.
-                'fill-extrusion-opacity': 0.9
+        map.addLayer(
+            {
+                'id': 'room-extrusion2',
+                'type': 'line',
+                'source': 'floorplan',
+                'paint': {
+                    'line-color': '#393D49',
+                    'line-width': 1
+                }
             }
-        });
+        );
+
+
     });
 </script>
 
