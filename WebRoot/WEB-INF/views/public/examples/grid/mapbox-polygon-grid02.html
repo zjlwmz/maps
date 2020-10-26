@@ -53,6 +53,31 @@
         );
 
 
+        map.addSource('fw', {
+            'type': 'geojson',
+            'data':
+                '${base!}/examples/testdata/fw_difference.geojson'
+        });
+
+
+        map.addLayer(
+            {
+                'id': 'fw0001',
+                'type': 'fill',
+                'source': 'fw',
+                'paint': {
+                    "fill-color": "#8099b4",
+                    "fill-outline-color": "#8099b4",
+                    "fill-opacity": 1,
+                    "fill-antialias": true
+                }
+            }
+        );
+
+
+
+
+
     });
 </script>
 
