@@ -283,8 +283,19 @@
                             "line-join": "bevel",
                             "line-cap": "butt"
                         },
+                        // "paint": {
+                        //     "line-color": "#0099ff",
+                        //     "line-width": 3,
+                        //     "line-opacity": 1
+                        // },
                         "paint": {
-                            "line-color": "#0099ff",
+                            "line-color": [
+                                "interpolate",
+                                ["linear"],
+                                ["zoom"],
+                                10, "green",
+                                14, "white"
+                            ],
                             "line-width": 3,
                             "line-opacity": 1
                         },
@@ -292,7 +303,8 @@
                             "==",
                             "labels",
                             "roads:highSpeedRailway"
-                        ]
+                        ],
+                        "minzoom": 14
                     },
                     {
                         "id": "city_normal_line_highSpeedRailway_fill",
