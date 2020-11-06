@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>mapbox turf 网格</title>
+    <title>mapbox turf 生成等值线</title>
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
@@ -98,69 +98,49 @@
 
 
 
-        addGridLayer();
+        addFeatureCollection();
 
 
     });
 
 
-    function addGridLayer() {
-        var centerPoint = turf.point([2.3399, 48.8555]);
-        //生成缓冲区
-        var buffered = turf.buffer(centerPoint, 10, {units: 'kilometers'});
-        //根据缓冲区生成bbox
-        var bbox = turf.bbox(buffered);
-        var cellSide = 1;
-        var options = {units: 'kilometers'};
-        //生成网格
-        var grid = turf.squareGrid(bbox, cellSide, options);
 
-        var pointGrid = turf.pointGrid(bbox, cellSide, options);
 
-        map.addSource('gridsource', {
+
+
+    function addFeatureCollection() {
+
+        var locationA = turf.point([126, 39.984], {name: 'Location A'});
+        var locationB = turf.point([-75.833, 39.284], {name: 'Location B'});
+        var locationC = turf.point([-75.534, 39.123], {name: 'Location C'});
+
+        var collections = turf.featureCollection([
+            locationA,
+            locationB,
+            locationC
+        ]);
+
+
+        //var collections = turf.featureCollection(features);
+        //var breaks = [0, 600,700,800,900, 1200,1500, 1800,2100, 2400,2700, 3000, 3600, 4200, 4800,5400, 6000];
+        //var lines = turf.isolines(collections, breaks, {zProperty: 'duration'});
+
+        map.addSource('linesource', {
             type: 'geojson',
-            data:grid
+            data:collections
         });
 
-        map.addSource('pointGrid', {
-            type: 'geojson',
-            data:pointGrid
-        });
-
-
-
-        var colors = ['#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c'];
         map.addLayer({
-            id: 'gridlayer',
-            type: 'fill',
-            source: 'gridsource',
+            id: 'linelayer',
+            type: 'line',
+            source: 'linesource',
             paint: {
-                'fill-color': '#486DE0',
-                'fill-outline-color':'#ffffff'
+                // 'line-color': '#486DE0',
+                // 'line-width':20
             }
         });
-
-
-        map.addLayer({
-            id: 'pointlayer',
-            type: 'circle',
-            source: 'pointGrid',
-            'paint': {
-                'circle-radius': {
-                    'base': 1.75,
-                    'stops': [
-                        [12, 4],
-                        [22, 180]
-                    ]
-                },
-                'circle-color': colors[3]
-            }
-        });
-
-
-
+        console.log(collections);
     }
-
 </script>
 
 </body>
