@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Extrude polygons for 3D indoor mapping</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+
+    /*
+ // 作者 yanue
+ // 参数：
+ // startColor：开始颜色hex
+ // endColor：结束颜色hex
+ // step:几个阶级（几步）
+ */
+    function gradientColor(startColor,endColor,step){
+        startRGB = this.colorRgb(startColor);//转换为rgb数组模式
+        startR = startRGB[0];
+        startG = startRGB[1];
+        startB = startRGB[2];
+        endRGB = this.colorRgb(endColor);
+        endR = endRGB[0];
+        endG = endRGB[1];
+        endB = endRGB[2];
+        sR = (endR-startR)/step;//总差值
+        sG = (endG-startG)/step;
+        sB = (endB-startB)/step;
+        var colorArr = [];
+        for(var i=0;i<step;i++){
+            //计算每一步的hex值
+            var hex = this.colorHex('rgb('+parseInt((sR*i+startR))+','+parseInt((sG*i+startG))+','+parseInt((sB*i+startB))+')');
+            colorArr.push(hex);
+        }
+        return colorArr;
+    };
+    // 将hex表示方式转换为rgb表示方式(这里返回rgb数组模式)
+    gradientColor.prototype.colorRgb = function(sColor){
+        var reg = /^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6})$/;
+        var sColor = sColor.toLowerCase();
+        if(sColor && reg.test(sColor)){
+            if(sColor.length === 4){
+                var sColorNew = "#";
+                for(var i=1; i<4; i+=1){
+                    sColorNew += sColor.slice(i,i+1).concat(sColor.slice(i,i+1));
+                }
+                sColor = sColorNew;
+            }
+            //处理六位的颜色值
+            var sColorChange = [];
+            for(var i=1; i<7; i+=2){
+                sColorChange.push(parseInt("0x"+sColor.slice(i,i+2)));
+            }
+            return sColorChange;
+        }else{
+            return sColor;
+        }
+    };
+    // 将rgb表示方式转换为hex表示方式
+    gradientColor.prototype.colorHex = function(rgb){
+        var _this = rgb;
+        var reg = /^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6})$/;
+        if(/^(rgb|RGB)/.test(_this)){
+            var aColor = _this.replace(/(?:(|)|rgb|RGB)*/g,"").split(",");
+            var strHex = "#";
+            for(var i=0; i<aColor.length; i++){
+                var hex = Number(aColor[i]).toString(16);
+                hex = hex<10 ? 0+''+hex :hex;// 保证每个rgb的值为2位
+                if(hex === "0"){
+                    hex += hex;
+                }
+                strHex += hex;
+            }
+            if(strHex.length !== 7){
+                strHex = _this;
+            }
+            return strHex;
+        }else if(reg.test(_this)){
+            var aNum = _this.replace(/#/,"").split("");
+            if(aNum.length === 6){
+                return _this;
+            }else if(aNum.length === 3){
+                var numHex = "#";
+                for(var i=0; i<aNum.length; i+=1){
+                    numHex += (aNum[i]+aNum[i]);
+                }
+                return numHex;
+            }
+        }else{
+            return _this;
+        }
+    };
+    var gradient = new gradientColor('#FF280E','#04554A',17);
+    var stopsList = [];
+    for(var i=0;i<gradient.length;i++){
+        var g = [i*60,gradient[i]];
+        stopsList.push(g);
+    }
+    console.log(gradient);//控制台输出
+
+
+
+    mapboxgl.accessToken = 'pk.eyJ1IjoiemhhbmdqaWFsdSIsImEiOiJjajRvOW44eDcwOGtqMzNxNnFvemQ2ZTlyIn0.i01rCdfpdvooSqkHQBxPBA';
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [116.6011440, 39.9485740],
+        zoom: 15.99,
+        pitch: 40,
+        bearing: 20,
+        antialias: true
+    });
+    map.on('load', function () {
+        map.addSource('isochrones', {
+            'type': 'geojson',
+            'data':
+                '${base!}/examples/testdata/isochrones/demo003.geojson'
+        });
+        map.addLayer(
+            {
+                'id': 'isochrones-01',
+                'type': 'line',
+                'source': 'isochrones',
+                'paint': {
+                    'line-color': '#393D49',
+                    'line-width': 1
+                }
+            }
+        );
+        map.addLayer(
+            {
+                'id': 'isochrones-02',
+                'type': 'fill',
+                'source': 'isochrones',
+                "layout":{
+                    'fill-sort-key': ['-', ['get', 'time']]
+                },
+                'paint': {
+                    'fill-color': {
+                        'property':'time',
+                        'stops':stopsList
+                        // 'stops': [
+                        //     [120, "#ffd0a6"],
+                        //     [180, "#ffd0a6"],
+                        //     [240, "#ffaa7f"],
+                        //     [300, "#ff704e"],
+                        //     [360, "#f04040"],
+                        //     [420, "#b50a09"]
+                        // ]
+                    }
+
+                }
+            }
+        );
+
+
+
+
+
+
+        map.addSource('jxm', {
+            'type': 'geojson',
+            'data':
+                '${base!}/examples/testdata/jxm_thematic2.geojson'
+        });
+
+        map.addSource('fw', {
+            'type': 'geojson',
+            'data':
+                '${base!}/examples/testdata/fw_difference.geojson'
+        });
+
+
+        map.addLayer(
+            {
+                'id': 'fw0001',
+                'type': 'fill',
+                'source': 'fw',
+                'paint': {
+                    "fill-color": "#8099b4",
+                    "fill-outline-color": "#8099b4",
+                    "fill-opacity": 1,
+                    "fill-antialias": true
+                }
+            }
+        );
+
+
+
+
+
+    });
+</script>
+
+</body>
+</html>
