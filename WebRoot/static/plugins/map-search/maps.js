@@ -119,11 +119,13 @@ function initMap(){
 	var gaoDeiImageUrl="https://wprd03.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}&scl=1&ltype=3";
 	var gaoDeiImageMap= L.tileLayer(gaoDeiImageUrl, {id: 'mapbox.light', attribution: "高德矢量地图"});
 
-//高德地图
+	//高德地图
 	var jpurl="http://maps.gsi.go.jp/xyz/std/{z}/{x}/{y}.png?_=20200402a";
 	var jpMap= L.tileLayer(jpurl, {id: 'mapbox.light', attribution: "jp"});
 
-	http://maps.gsi.go.jp/xyz/std/8/227/102.png?_=20200402a
+	//天地图影像
+	var tdtImage = "http://t2.tianditu.gov.cn/img_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=w&TileMatrix={z}&TileRow={y}&TileCol={x}&style=default&format=tiles&tk=b684b9e680b3efcc4c517800bd863a75";
+	var tdtMap= L.tileLayer(tdtImage, {id: 'tianditu.light', attribution: "jp"});
 	
 	
 	//geoserver wms
@@ -181,7 +183,8 @@ function initMap(){
 		"谷歌矢量": googleVectorMap,
 		"谷歌影像": googleImageMap,
 		"高德矢量":gaoDeiImageMap,
-		"jpMap":jpMap
+		"日本地图":jpMap,
+		"天地图影像":tdtMap
 	};
 	L.control.layers(baseLayers,layers).addTo(map);
 	L.control.mousePosition().addTo(map);
