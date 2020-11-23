@@ -1,3 +1,44 @@
 
 # 示例访问地址
 http://localhost:8080/maps/example/index?name=public/examples/mapbox-local4_custom_style
+
+
+# 等时圈示例
+http://localhost:8080/maps/example/index?name=public/examples/get-started-isochrone-api
+http://localhost:8080/maps/example/index?name=public/examples/isochrones/mapbox-isochrone001
+
+http://localhost:8080/maps/example/index?name=public/examples/isochrones/mapbox-isochrone002
+
+#turf
+http://localhost:8080/maps/example/index?name=public/examples/turf/mapbx-turf
+
+http://localhost:8080/maps/example/index?name=public/examples/turf/mapbx-turf001
+
+
+
+
+
+#isochrones
+http://localhost:8080/maps/example/index?name=public/examples/isochrones/mapx-isochrones
+
+#stops
+// // 等值面
+// map.addLayer({
+//     id: 'polygonlayer',
+//     type: 'fill',
+//     source: 'linesource',
+//     paint: {
+//         'fill-color': {
+//             'property':'time',
+//             'stops': [
+//                 [0, "#ffd0a6"],
+//                 [10, "#ffd0a6"],
+//                 [100, "#ffaa7f"],
+//                 [500, "#ff704e"],
+//                 [3540, "#f04040"],
+//                 [3600, "#b50a09"]
+//             ]
+//         },
+//         'fill-opacity':0.2
+//     }
+// });
