@@ -98,7 +98,7 @@
             return _this;
         }
     };
-    var gradient = new gradientColor('#FFF252','#0A4455',15);
+    var gradient = new gradientColor('#FF280E','#04554A',17);
     var stopsList = [];
     for(var i=0;i<gradient.length;i++){
         var g = [i*60,gradient[i]];
@@ -119,22 +119,21 @@
         antialias: true
     });
     map.on('load', function () {
+
+
+        /**
+         * 加载等时间圈数据 源-------
+         */
         map.addSource('isochrones', {
             'type': 'geojson',
             'data':
-                '${base!}/examples/testdata/isochrones/demo003.geojson'
+                'http://192.168.1.127:8686/wldbapi/s/data/2c4fa26880d54598bebf64e2acc37304/query'
         });
-        map.addLayer(
-            {
-                'id': 'isochrones-01',
-                'type': 'line',
-                'source': 'isochrones',
-                'paint': {
-                    'line-color': '#393D49',
-                    'line-width': 1
-                }
-            }
-        );
+
+
+        /**
+         * 添加等时圈面图层
+         */
         map.addLayer(
             {
                 'id': 'isochrones-02',
@@ -147,20 +146,15 @@
                     'fill-color': {
                         'property':'time',
                         'stops':stopsList
-                        // 'stops': [
-                        //     [120, "#ffd0a6"],
-                        //     [180, "#ffd0a6"],
-                        //     [240, "#ffaa7f"],
-                        //     [300, "#ff704e"],
-                        //     [360, "#f04040"],
-                        //     [420, "#b50a09"]
-                        // ]
                     }
 
                 }
             }
         );
 
+        /**
+         *  等时圈加载完成------
+         */
 
 
 
