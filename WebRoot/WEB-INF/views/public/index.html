@@ -54,8 +54,13 @@
   	   	 		<div id="grn"></div>
   	   	 		<div id="gru"></div>
   	   	 		<div id="gra">
-  	   	 			<a href="/login.aspx">登录</a>
-  	   	 			<a href="/join.aspx">注册</a>
+					<%if(isNotEmpty(obj.userInfo)){%>
+						<a href="${base!}">${obj.userInfo.nickName!}</a>
+					<%}else{%>
+					<a href="${base!}/login">登录</a>
+					<a href="/join.aspx">注册</a>
+					<%}%>
+
   	   	 		</div>
   	   	     </div>
   	   	  </div> 
