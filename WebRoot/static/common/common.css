@@ -1,0 +1,50 @@
+/*!
+ * Copyright (c) 2013-Now http://jeesite.com All rights reserved.
+ * 项目自定义的公共CSS，可覆盖jeesite.css里的样式
+ */
+ body,html{padding: 0;margin: 0;font-family: "Microsoft YaHei";height: 100%;}
+ 
+ header{min-width:1200px;}
+ ::-webkit-scrollbar {
+	width: 10px!important;
+	height: 10px!important;
+	-webkit-appearance: none
+}
+
+::-webkit-scrollbar-thumb {
+	height: 5px;
+	border: 1px solid transparent;
+	border-top: 0;
+	border-bottom: 0;
+	-webkit-border-radius: 6px;
+	background-color: #ccc;
+	background-clip: padding-box
+}
+.vehicle-container{
+	overflow-y:auto;
+}
+		
+.loginout{
+	color: white;
+}
+.loginout:HOVER {
+	color: white;
+}
+
+input:focus {
+    outline:none;
+}
+.warn-hide{
+	visibility: hidden;
+}
+header{
+	color: #58d4fd;
+}
+
+/*webuploader 只读设置*/
+.wup_container.disabled .btncancel .delete{
+	display: none !important;
+}
+.wup_container.disabled .webuploader-pick{
+	display: none !important;
+}
