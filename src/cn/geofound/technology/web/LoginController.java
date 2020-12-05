@@ -1,14 +1,20 @@
 package cn.geofound.technology.web;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import cn.geofound.framework.base.Result;
+import com.alibaba.fastjson.JSON;
 import org.nutz.dao.Cnd;
+import org.nutz.http.Http;
+import org.nutz.http.Response;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.util.NutMap;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.ViewModel;
@@ -47,12 +53,18 @@ public class LoginController {
 	@Inject
 	private UserService userService;
 	
-	
+
 	/**
 	 * 角色service接口
 	 */
 	@Inject
 	private RoleService roleService;
+
+	@Inject("java:$custom.get('api.domain')")
+	private String apiDomain;
+
+
+
 	
 	@At(value={"/login"})
 	@GET
@@ -60,7 +72,7 @@ public class LoginController {
 	public Object login(ViewModel model,HttpSession httpSession){
 		User user=(User) httpSession.getAttribute("user");
 		if(null==httpSession.getAttribute("user")){
-			return "beetl:/login.html";
+			return "beetl:/platform/login.html";
 		}
 		model.addv("date", DateUtils.getDate("yyyy年MM月dd日"));
 		model.addv("username", user.getUsername());
@@ -73,35 +85,37 @@ public class LoginController {
 	 */
 	@At("/login")
 	@POST
-	@Ok("re")
-	public Object doLogin(@Param("loginname")String loginname,@Param("password")String password,HttpServletRequest request,HttpServletResponse response,HttpSession httpSession,ViewModel model){
+	public Object doLogin(@Param("loginname")String loginName,@Param("password")String password,HttpServletRequest request,HttpServletResponse response,HttpSession httpSession,ViewModel model){
 		try{
-			if(StringUtils.isBlank(loginname)){
-				model.addv("msg", "登录名称不能为空");
-				return "beetl:/login.html";
+			if(StringUtils.isBlank(loginName)){
+				return Result.error("登录名称不能为空");
 			}
 			
 			if(StringUtils.isBlank(password)){
-				model.addv("msg", "密码名称不能为空");
-				return "beetl:/login.html";
+				return Result.error("密码名称不能为空");
 			}
-			
-			User user=userService.fetch(Cnd.where("loginname", "=", loginname).and("passWord","=", password));
-			if(null==user){
-				model.addv("msg", "用户密码错误");
-				return "beetl:/login.html";
+
+			NutMap nutMap = new NutMap();
+			nutMap.put("loginName",loginName);
+			nutMap.put("password",password);
+			Response responseHttp = Http.post2(apiDomain+"/s/login/login",nutMap,3000);
+			if(responseHttp.isOK()){
+				String content = responseHttp.getContent();
+				if(StringUtils.isNotBlank(content)){
+					Result result = JSON.parseObject(content,Result.class);
+					if(result.getCode() == 0){
+						Map<String,Object> data = (Map<String, Object>) result.getData();
+						String token = data.get("token").toString();
+						CookieUtils.setCookie(response, "token", token,60*60*24*15);//15天
+					}
+
+					return result;
+				}
 			}
-			model.addv("date", DateUtils.getDate("yyyy年MM月dd日"));
-			model.addv("username", user.getUsername());
-			CookieUtils.setCookie(response, cookie_userId, user.getId());
-			List<Menu>menuList=roleService.findMenuList(user.getRoleId());
-			httpSession.setAttribute("user", user);
-			httpSession.setAttribute("menuList", menuList);
-			return "redirect:/vehicle/monitoring";
+			return Result.error("登录失败");
 		}catch (Exception e) {
-			log.error("用户登录", e);
-			model.addv("msg", "请联系管理员");
-			return "redirect:/vehicle/monitoring";
+			log.error("登录失败", e);
+			return Result.error("登录失败");
 		}
 	}
 	
