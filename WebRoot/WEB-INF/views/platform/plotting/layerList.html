@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="${base!}/static/plugins/layui-v2.5.4/layui/css/layui.css" type="text/css"></link>
+    <script type="text/javascript">var baseUrl="${base!}"</script>
+    <script type="text/javascript" src="${base!}/static/plugins/map-search/config.js"></script>
+    <script type="text/javascript" src="${base!}/static/plugins/layui-v2.5.4/layui/layui.js"></script>
+</head>
+<body>
+<!-- 表格数据容器 -->
+<div id="layui-table-container">
+    <form class="layui-form" style="margin: 5px;">
+        <input type="hidden" id="mapId" name="mapId" value="${obj.mapId}"/>
+        <input type="hidden" id="mapIndex" name="mapIndex" value="${obj.mapIndex}"/>
+        搜索：
+        <div class="layui-inline">
+            <input class="layui-input" name="id" id="demoReload" autocomplete="off">
+        </div>
+        <button class="layui-btn layer-list-search" lay-submit lay-filter="plotting_search">查询</button>
+        <button id="layer-add" type="button" class="layui-btn layui-btn-normal">新增</button>
+    </form>
+    <table class="layui-hide" id="layer-list" lay-filter="layer_list_event"></table>
+</div>
+</body>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<script>
+    var $=null,element,layer,form,table,tree,util;
+    layui.use(['element','layer','form','table','tree', 'util'], function(){
+        $ = layui.jquery,element = layui.element,layer = layui.layer,form = layui.form,table=layui.table,tree=layui.tree,util=layui.util;
+        var mapId = $("#mapId").val();
+        layuiTableList(mapId);
+
+        initDom(2);
+    });
+
+    function initDom(){
+        $("#layer-add").click(function(){
+            addLayerForm();
+        });
+    };
+    /**
+     * 表格数据
+     */
+    function layuiTableList(mapId){
+        var url = ioc.api.url.domain+"/api/layer/list";
+        table.render({
+            elem: '#layer-list'
+            ,url:url
+            ,where:{
+                mapId:mapId
+            }
+            ,toolbar: false
+            ,title: '标绘数据表'
+            ,totalRow: false
+            ,cols: [[
+                {field:'id', title:'ID', width:280, fixed: 'left', unresize: true, sort: true, totalRowText: '合计行'}
+                ,{field:'layer_name', title:'名称'}
+                ,{field:'layer_describe', title:'描述', width:180, sort: true, totalRow: true}
+                ,{field:'layer_style', title:'样式', width:180, sort: true}
+                ,{fixed: 'right', title:'操作', toolbar: "#barDemo", width:200}
+            ]]
+            ,page: true
+            ,response: {
+                statusCode: 0 //重新规定成功的状态码为 200，table 组件默认为 0
+            }
+            ,parseData: function(res){ //将原始数据解析成 table 组件所规定的数据
+                return {
+                    "code": res.code, //解析接口状态
+                    "msg": res.msg, //解析提示文本
+                    "count": res.data.length, //解析数据长度
+                    "data": res.data //解析数据列表
+                };
+            }
+        });
+
+
+        //头工具栏事件
+        table.on('toolbar(layer_list_event)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch(obj.event){
+                case 'getgeojson':
+                    layer.msg('添加getgeojson');
+                    break;
+                case 'delete':
+                    layer.msg('删除');
+                    break;
+                case 'update':
+                    layer.msg('编辑');
+                    break;
+            };
+        });
+
+        //监听行工具事件
+        table.on('tool(layer_list_event)', function(obj){
+            var rowData = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+
+                    $.ajax({
+                        url:ioc.api.url.domain+"/api/layer/del",
+                        method:"POST",
+                        dataType:"json",
+                        data:{
+                            id:rowData.id
+                        },
+                        success:function(data){
+                            if(data.code==0){
+                                obj.del();
+                            }
+                        }
+                    });
+                    layer.close(index);
+                });
+            }else if(obj.event === 'edit'){
+                editLayerForm(obj.data);
+            }
+        });
+
+    };
+
+    function addLayerForm(){
+        var mapId = $("#mapId").val();
+        var layerIndex = parent.layer.open({
+            type: 2,
+            maxmin: true,
+            // shade:0,
+            offset: 'auto',
+            area: ['520px', '400px'],
+            shadeClose: true, //点击遮罩关闭
+            content: baseUrl+"/view/map/layer/form",
+            title: "图层信息",
+            skin: 'demo-class',
+            success:function(){
+                var body = parent.layer.getChildFrame('body', layerIndex);
+                $(body).find("#mapId").val(mapId);
+                $(body).find("#mapIndex").val($("#mapIndex").val());
+                $(body).find("#layerIndex").val(layerIndex);
+
+            }
+        });
+    };
+
+
+
+    function editLayerForm(properties){
+        var mapId = $("#mapId").val();
+        var layerIndex = parent.layer.open({
+            type: 2,
+            maxmin: true,
+            // shade:0,
+            offset: 'auto',
+            area: ['520px', '400px'],
+            shadeClose: true, //点击遮罩关闭
+            content: baseUrl+"/view/map/layer/form",
+            title: "图层信息",
+            skin: 'demo-class',
+            success:function(){
+                var body = parent.layer.getChildFrame('body', layerIndex);
+                $(body).find("#mapId").val(mapId);
+                $(body).find("#mapIndex").val($("#mapIndex").val());
+                $(body).find("#layerIndex").val(layerIndex);
+                $(body).find("#name").val(properties.name);
+                $(body).find("#describe").val(properties.describe);
+
+            }
+        });
+    };
+
+
+
+    function reloadMapLayerList(){
+        var index = top.layer.load(0, {shade: false});
+        top.layer.close(index);
+        table.reload('layer-list');
+    }
+</script>
+</html>
