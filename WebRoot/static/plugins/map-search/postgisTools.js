@@ -58,8 +58,7 @@ layui.use(['element','layer','form','table','tree', 'util'], function(){
 				latlngs = JSON.stringify(latlngs);
 			}
 			var name= $("#plotting-container").find("#name").val();
-			debugger;
-			var url=baseUrl+"/api/plotting/insert";
+			var url = baseUrl+"/api/plotting/insert";
 			ajaxPost(url,{
 				"geojson":geojson,
 				"latLngs":latlngs,
@@ -160,11 +159,18 @@ function initDom(){
 						$(layerList).each(function(m,n){
 							mapLayList.append("<option value='"+n.id+"'>"+n.layer_name+"</option>");
 						});
+
+						//清空地图
+						drawnItems.clearLayers();
 					});
 					$(".map-layer-list").change(function(){
 						var layerId = $(this).val();
 						if(layerId){
+							$("#leaflet-draw-control").show();
 							getLayerData(layerId);
+						}else{
+							drawnItems.clearLayers();
+							$("#leaflet-draw-control").hide();
 						}
 					});
 
@@ -599,7 +605,8 @@ function drawTools(){
             polygon: {
                 allowIntersection: false,
                 showArea: true
-            }
+            },
+			circlemarker:false
         }
     }));
 	
@@ -610,23 +617,22 @@ function drawTools(){
 	
 	//创建完成后
     map.on(L.Draw.Event.CREATED, function (event) {
+    	debugger;
         var layer = event.layer;
         drawnItems.addLayer(layer);
         is_open_map_click=true;
         var geojsonObj = layer.toGeoJSON();
         var layerType = event.layerType;
         if(layerType == "circle"){
-        	var radius = layer.getRadius();
-        	geojsonObj.properties["radius"]=radius;
+        	var radius = layer.getRadius()/1000;
+			var options = {steps: 64, units: 'kilometers', properties: {foo: 'bar'}};
+			geojsonObj = turf.circle(geojsonObj.geometry.coordinates, radius, options);
         }else if(layerType=="circlemarker"){
-        	var radius = layer.getRadius();
-        	geojsonObj.properties["radius"]=radius;
-        }else if(layerType=="marker"){
-        }else{
+			var radius = layer.getRadius()/1000;
+			var options = {steps: 64, units: 'kilometers', properties: {foo: 'bar'}};
+			geojsonObj = turf.circle(geojsonObj.geometry.coordinates, radius, options);
         }
-        geojsonObj.properties["type"]=layerType;
         var geojson=JSON.stringify(geojsonObj);
-       
         console.log(geojson);
         openPlottingForm(geojson,geojsonObj.geometry.type);
     });
@@ -652,7 +658,6 @@ function drawTools(){
     		},function(jsondata){
     			layer.msg(jsondata.msg);
 				if(jsondata.code==0){
-					//findPlottingList();
 					$(".map-layer-list").trigger("change");
 				}
     		});
@@ -692,7 +697,6 @@ function drawTools(){
     		},function(jsondata){
     			layer.msg(jsondata.msg);
 				if(jsondata.code==0){
-					//findPlottingList();
 					$(".map-layer-list").trigger("change");
 				}
     		});
@@ -753,122 +757,6 @@ function editPlottingForm(properties,geojson,type){
 }
 
 
-/**
- *  标绘查询
- */
-function findPlottingList(){
-	drawnItems.clearLayers();
-	$("#p1").empty().append("<option value=''>请选择</option>");
-	$("#p2").empty().append("<option value=''>请选择</option>");
-	var config = {
-	    radius: 8,
-	    fillColor: "#ff7800",
-	    color: "#000",
-	    weight: 1,
-	    opacity: 1,
-	    fillOpacity: 0.3
-	};
-
-	$.ajax({
-		url:baseUrl+"/api/plotting/list",
-		method:"POST",
-		dataType:"json",
-		data:{},
-		success:function(data){
-			//console.log(data);
-			if(data.code==0){
-				var list = data.data;
-				$(list).each(function(index,obj){
-					
-					$("#p1").append("<option value='"+obj.id+"'>"+obj.name+"</option>");
-					$("#p2").append("<option value='"+obj.id+"'>"+obj.name+"</option>");
-					
-					var type = obj.type;
-					if (type=="Point"){
-						var latLng =eval('('+obj.latLngs+')');
-						var marker = L.marker(latLng,{id:obj.id});
-						drawnItems.addLayer(marker);
-					}else if(type=="circle"){
-						var geojson=eval('('+obj.geom+')');
-						var latLng =eval('('+obj.latLngs+')');
-						var radius = obj.radius;
-						
-						var circle=L.circle(latLng,radius, {
-						    color: 'red',//颜色
-						    fillColor: '#f03',
-						    fillOpacity:0.5,//透明度
-						    dashArray: '5',  //设置虚线
-						    id:obj.id
-						});
-						drawnItems.addLayer(circle);
-					}else if(type=="circlemarker"){
-						var radius = obj.radius;
-						var option={
-								id:obj.id,
-								radius:radius,
-								stroke: true,
-								color: '#3388ff',
-								weight: 4,
-								opacity: 0.5,
-								fill: true,
-								fillColor: null, //same as color by default
-								fillOpacity: 0.2,
-								clickable: true,
-								zIndexOffset: 2000 // This should be > than the highest z-index any markers
-						}
-						var latLng =eval('('+obj.latLngs+')');
-						var circle=L.circleMarker(latLng, option);
-						drawnItems.addLayer(circle);
-					}else if(type=="Polygon" || type=="polygon" || type == "MultiPolygon"){
-						var geojson=eval('('+obj.geom+')');
-						var latLngs =eval(obj.latLngs);
-						var polygon2 = L.polygon(latLngs, {
-							    color: 'green',
-							    fillColor: '#f03',
-							    fillOpacity: 0.5,
-							    id:obj.id
-						});
-						drawnItems.addLayer(polygon2);
-					}else if(type=="rectangle"){
-						var geojson=eval('('+obj.geom+')');
-						var latLngs =eval(obj.latLngs);
-						var rectangle = L.polygon(latLngs, {
-							clickable: true,
-							color: "#3388ff",
-							fill: true,
-							fillColor: null,
-							fillOpacity: 0.2,
-							opacity: 0.5,
-							showArea: true,
-							stroke: true,
-							weight: 4,
-							id:obj.id
-						});
-						drawnItems.addLayer(rectangle);
-					}else if(type=="Polyline" || type=="polyline" || type=="LineString" || type=="MultiLineString"){
-						var latLngs =eval(obj.latLngs);
-						var polyline = L.polyline(latLngs, { color: 'red',id:obj.id });
-						drawnItems.addLayer(polyline);
-					}else if(type=="marker"){
-						var latLng =eval('('+obj.latLngs+')');
-						var marker = L.marker(latLng,{id:obj.id});
-						drawnItems.addLayer(marker);
-					}
-					else{
-						
-					}
-					
-				});
-				
-				
-				
-				
-				//layuid form 渲染
-				form.render();
-			}
-		}
-	});
-};
 
 /**
  * 图层数据
@@ -880,10 +768,11 @@ function showLayerData(list){
 		var properties = obj.properties;
 		var type = obj.properties.type;
 		if (type=="Point"){
-			var latLng =eval('('+obj.latLngs+')');
+			var latLng = L.geoJSON(geometry).getLayers()[0]._latlng;
 			var marker = L.marker(latLng,{id:obj.id});
 			drawnItems.addLayer(marker);
 		}else if(type=="circle"){
+
 			var geojson=eval('('+obj.geom+')');
 			var latLng =eval('('+obj.latLngs+')');
 			var radius = obj.radius;

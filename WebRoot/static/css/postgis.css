@@ -4,9 +4,9 @@ html,body{
 	width: 100%;
 	height: 100%;
 }
-/*#leaflet-draw-control{*/
-/*	display: none;*/
-/*}*/
+#leaflet-draw-control{
+	display: none;
+}
 
 #plotting-container{
 	position: absolute;
