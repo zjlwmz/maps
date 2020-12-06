@@ -16,6 +16,34 @@
 
 <link rel="stylesheet" href="${base!}/static/css/postgis.css?t=1.86" type="text/css"></link>
 
+<style type="text/css">
+	#my-map-div{
+		position: absolute;
+		top:5px;
+		left: 70px;
+		z-index: 10000;
+	}
+	.my-map-list{
+		clear: both;
+		background-color: white;
+		display: none;
+	}
+	.my-map-list ul li{
+		cursor: pointer;
+		line-height: 20px;
+	}
+	.my-map-list ul li:hover{
+		color: #ffa810;
+	}
+	.left{
+		float: left;
+	}
+	.right{
+		float: right;
+	}
+</style>
+
+
 <script type="text/javascript" src="${base!}/static/plugins/utils/GPS.js"></script>
 <script type="text/javascript" src="${base!}/static/plugins/layui-v2.5.4/layui/layui.js"></script>
 <script type="text/javascript" src="${base!}/static/plugins/leaflet/leaflet.js"></script>
@@ -28,9 +56,11 @@
 <script type="text/javascript" src="${base!}/static/plugins/map-search/config.js"></script>
 <script type="text/javascript" src="${base!}/static/plugins/map-search/mapServerUtils.js?t=1.23"></script>
 
-<script type="text/javascript" src="${base!}/static/plugins/map-search/postgisTools.js?t=1.67"></script>
+<script type="text/javascript" src="${base!}/static/plugins/map-search/postgisTools.js?t=1.681"></script>
 
 <script type="text/javascript">var baseUrl="${base!}"</script>
+
+
 
 </head>
 <body>
@@ -126,20 +156,12 @@
 	<!-- 表格数据容器 -->
 	<div id="layui-table-container">
 		<form class="layui-form" style="margin: 5px;">
-			<div class="layui-form-item">
-			
-			    <div class="layui-inline">
-			      <label class="layui-form-label">名称</label>
-			      <div class="layui-input-inline">
-			        <input type="text" name="keyword" autocomplete="off" class="layui-input" />
-			      </div>
-			    </div>
-			    
-			    <div class="layui-inline">
-			     <button class="layui-btn" lay-submit lay-filter="plotting_search">查询</button>
-			    </div>
-			    
+			搜索：
+			<div class="layui-inline">
+				<input class="layui-input" name="id" id="demoReload" autocomplete="off">
 			</div>
+			<button class="layui-btn" lay-submit lay-filter="plotting_search">查询</button>
+			<button id="add-map-btn" type="button" class="layui-btn layui-btn-normal">新增</button>
 		</form>
 		<table class="layui-hide" id="plotting-list" lay-filter="plotting_list_event"></table>
 	</div>
@@ -149,12 +171,30 @@
 	<div id="layui-comptoos-container">
 		<div id="test1" class="demo-tree demo-tree-box"></div>
 	</div>
+
+	<!-- 我的地图 -->
+	<div id="my-map-div">
+		<div class="left"><button id="mymap" type="button" class="layui-btn">我的地图</button></div>
+		<div class="right">
+			<select class="map-layer-list">
+				<option>请选择</option>
+			</select>
+		</div>
+		<div class="my-map-list">
+			<ul>
+				<li>地图1</li>
+				<li>地图2</li>
+				<li>地图3</li>
+			</ul>
+		</div>
+	</div>
 	
-	<div id=map></div>
+	<div id="map"></div>
 </body>
 <script type="text/html" id="barDemo">
-  <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">按钮1</a>
-  <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">按钮2</a>
+	<a class="layui-btn layui-btn-xs  layui-btn-warm" lay-event="list">列表</a>
+	<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+	<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
 </script>
 <script>
 	var _hmt = _hmt || [];
