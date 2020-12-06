@@ -46,7 +46,6 @@ layui.use(['element','layer','form','table','tree', 'util'], function(){
 		var json = JSON.stringify(data.field);
 		var layersList = resultLayer.getLayers();
 		$(layersList).each(function(index,obj){
-			//var geojson = obj.toGeoJSON();
 			var geojson =obj.getLayers()[0].toGeoJSON();
 			geojson = JSON.stringify(geojson);
 			var type = obj.getLayers()[0].toGeoJSON().geometry.type;
@@ -59,7 +58,7 @@ layui.use(['element','layer','form','table','tree', 'util'], function(){
 				latlngs = JSON.stringify(latlngs);
 			}
 			var name= $("#plotting-container").find("#name").val();
-			
+			debugger;
 			var url=baseUrl+"/api/plotting/insert";
 			ajaxPost(url,{
 				"geojson":geojson,
@@ -69,7 +68,7 @@ layui.use(['element','layer','form','table','tree', 'util'], function(){
 			},function(jsondata){
 				layer.msg(jsondata.msg);
 				if(jsondata.code==0){
-					findPlottingList();
+					$(".map-layer-list").trigger("change");
 				}
 			});
 		});
@@ -106,7 +105,7 @@ function init() {
 	drawTools();
 	
 	//标绘查询
-	findPlottingList();
+	//findPlottingList();
 	
 	//标绘表格数据查询
 	layuiTableList();
@@ -138,7 +137,168 @@ function initDom(){
 			initPosgisFunctionTree();
 		}
 	});
+
+
+
+	$("#mymap").click(function(){
+		var mylistUl = $(".my-map-list ul");
+		mylistUl.empty();
+		findMapList(function (data) {
+			let list = data.list;
+			$(list).each(function(index,obj){
+				var li = $("<li data-id='"+obj.id+"'>"+obj.mapName+"</li>");
+				li.click(function(){
+					let mapName = $(this).text();
+					let mapId = li.data().id;
+					$("#mymap").text(mapName);
+					$("#mymap").data("id",mapId);
+					$(".my-map-list").hide();
+					findLayerList(mapId,function(layerData){
+						let mapLayList = $(".map-layer-list");
+						let layerList = layerData.data;
+						mapLayList.empty().append("<option value=''>请选择图层</option>");
+						$(layerList).each(function(m,n){
+							mapLayList.append("<option value='"+n.id+"'>"+n.layer_name+"</option>");
+						});
+					});
+					$(".map-layer-list").change(function(){
+						var layerId = $(this).val();
+						if(layerId){
+							getLayerData(layerId);
+						}
+					});
+
+
+				});
+				mylistUl.append(li);
+			});
+			$(".my-map-list").show();
+		});
+	});
+
+
+
+	$("#add-map-btn").click(function(){
+		addMapForm();
+	});
 };
+
+
+
+function addMapForm(properties){
+	parent.layer.closeAll();
+	var layerIndex = parent.layer.open({
+		type: 2,
+		maxmin: true,
+		// shade:0,
+		offset: 'auto',
+		area: ['520px', '400px'],
+		shadeClose: true, //点击遮罩关闭
+		content: baseUrl+"/view/map/form",
+		title: "我的地图",
+		skin: 'demo-class',
+		success:function(){
+
+		}
+	});
+};
+function reloadMapList(){
+	table.reload('plotting-list');
+};
+
+function editMapForm(properties){
+	parent.layer.closeAll();
+	var layerIndex = parent.layer.open({
+		type: 2,
+		maxmin: true,
+		// shade:0,
+		offset: 'auto',
+		area: ['520px', '400px'],
+		shadeClose: true, //点击遮罩关闭
+		content: baseUrl+"/view/map/form",
+		title: "我的地图",
+		skin: 'demo-class',
+		success:function(){
+			var body = layer.getChildFrame('body', layerIndex);
+			$(body).find("#id").val(properties.id);
+			$(body).find("#mapName").val(properties.mapName);
+			$(body).find("#mapDescribe").val(properties.mapDescribe);
+		}
+	});
+};
+
+
+function getMapLayerList(mapId){
+	parent.layer.closeAll();
+	var layerIndex = parent.layer.open({
+		type: 2,
+		maxmin: true,
+		shade:0,
+		offset: 'auto',
+		area: ['1024px', '580px'],
+		shadeClose: true, //点击遮罩关闭
+		content: baseUrl+"/view/map/layer/list",
+		title: "我的地图",
+		skin: 'demo-class',
+		success:function(){
+			var body = layer.getChildFrame('body', layerIndex);
+			$(body).find("#mapId").val(mapId);
+			$(body).find("#mapIndex").val(layerIndex);
+		}
+	});
+};
+
+
+/**
+ * 地图列表
+ */
+function findMapList(callback){
+	$.ajax({
+		url:ioc.api.url.domain+"/api/map/list",
+		method:"POST",
+		dataType:"json",
+		data:{
+			pageNo:1,
+			pageSize:100
+		},
+		success:function(data){
+			if(callback)callback(data);
+		}
+	});
+};
+
+function findLayerList(mapId,callback){
+	$.ajax({
+		url:ioc.api.url.domain+"/api/layer/list",
+		method:"POST",
+		dataType:"json",
+		data:{
+			mapId:mapId
+		},
+		success:function(data){
+			if(callback)callback(data);
+		}
+	});
+};
+
+function getLayerData(layerId){
+	$.ajax({
+		url:ioc.api.url.domain+"/api/layer/data/query",
+		method:"POST",
+		dataType:"json",
+		data:{
+			id:layerId
+		},
+		success:function(data){
+			console.log(data);
+			if(data.code == 0){
+				var jsonData = data.data;
+				var list = jsonData.list;
+				showLayerData(list);
+			}
+		}
+	});
+}
 
 
 /**
@@ -195,7 +355,12 @@ function initMap(){
 	searchMarkerLayer= L.layerGroup([]).addTo(map);
 	
 	//标绘图层
-	drawnItems = L.featureGroup().addTo(map);
+	drawnItems = L.featureGroup().on('click',function(event){
+		var layer = event.layer;
+		var geojson = layer.toGeoJSON();
+		var properties = layer.options.properties;
+		editPlottingForm(properties,JSON.stringify(geojson),geojson.geometry.type);
+	}).addTo(map);
 	
 	//结果图层
 	resultLayer = L.layerGroup([]).addTo(map);
@@ -448,34 +613,22 @@ function drawTools(){
         var layer = event.layer;
         drawnItems.addLayer(layer);
         is_open_map_click=true;
-        
-        var latLngsJson;
         var geojsonObj = layer.toGeoJSON();
         var layerType = event.layerType;
         if(layerType == "circle"){
         	var radius = layer.getRadius();
         	geojsonObj.properties["radius"]=radius;
-        	
-        	var latLng=layer.getLatLng();
-            latLngsJson=JSON.stringify(latLng);
         }else if(layerType=="circlemarker"){
         	var radius = layer.getRadius();
         	geojsonObj.properties["radius"]=radius;
-        	
-        	var latLng=layer.getLatLng();
-            latLngsJson=JSON.stringify(latLng);
         }else if(layerType=="marker"){
-        	var latLng=layer.getLatLng();
-            latLngsJson=JSON.stringify(latLng);
         }else{
-        	var latLngs=layer.getLatLngs();
-            latLngsJson=JSON.stringify(latLngs);
         }
         geojsonObj.properties["type"]=layerType;
         var geojson=JSON.stringify(geojsonObj);
        
         console.log(geojson);
-        openPlottingForm(geojson,latLngsJson);
+        openPlottingForm(geojson,geojsonObj.geometry.type);
     });
   	
     
@@ -490,14 +643,17 @@ function drawTools(){
     	});
     	if(dataIdList.length>0){
     		var ids = dataIdList.join(",");
+			var layerId = $(".map-layer-list").val();
     		//标绘删除
-    		var url=baseUrl+"/api/plotting/delete";
+    		var url=ioc.api.url.domain+"/api/layer/data/del";
     		ajaxPost(url,{
-    			id:ids
+    			id:ids,
+				layerId:layerId
     		},function(jsondata){
     			layer.msg(jsondata.msg);
 				if(jsondata.code==0){
-					findPlottingList();
+					//findPlottingList();
+					$(".map-layer-list").trigger("change");
 				}
     		});
     	}
@@ -516,25 +672,28 @@ function drawTools(){
 			var latlngs;
 			if(type=="Point"){
 				latlngs = obj.getLatLng()
-				latlngs = JSON.stringify(latlngs);
 			}else{
 				latlngs = obj.getLatLngs()
-				latlngs = JSON.stringify(latlngs);
 			}
 			
     		var options = obj.options;
+			var properties = options.properties;
     		var id = options.id;
-    		//标绘删除
-    		var url=baseUrl+"/api/plotting/update";
+    		//标绘数据更新
+    		var url=ioc.api.url.domain+"/api/layer/data/add";
     		ajaxPost(url,{
     			id:id,
+				layerId:properties.layer_id,
+				mapId:properties.map_id,
+				name:properties.name,
+				describe:properties.describe,
     			type:type,
-    			geojson:geojson,
-    			latLngs:latlngs
+    			geojson:geojson
     		},function(jsondata){
     			layer.msg(jsondata.msg);
 				if(jsondata.code==0){
-					findPlottingList();
+					//findPlottingList();
+					$(".map-layer-list").trigger("change");
 				}
     		});
     	});
@@ -544,7 +703,9 @@ function drawTools(){
 /**
  * 数据上传
  */
-function openPlottingForm(geojson,latLngs){
+function openPlottingForm(geojson,type){
+	var mapId = $("#mymap").data("id");
+	var layerId = $(".map-layer-list").val();
 	var layerIndex=parent.layer.open({
 	      type: 2,
 	      maxmin: true,
@@ -558,10 +719,39 @@ function openPlottingForm(geojson,latLngs){
 		  success:function(){
 			  var body = layer.getChildFrame('body', layerIndex);
 			  $(body).find("#geojson").val(geojson);
-			  $(body).find("#latLngs").val(latLngs);
+			  $(body).find("#mapId").val(mapId);
+			  $(body).find("#layerId").val(layerId);
+			  $(body).find("#type").val(type);
 		  }
 	});
 }
+
+function editPlottingForm(properties,geojson,type){
+	parent.layer.closeAll();
+	var mapId = $("#mymap").data("id");
+	var layerId = $(".map-layer-list").val();
+	var layerIndex=parent.layer.open({
+		type: 2,
+		maxmin: true,
+		shade:0,
+		offset: 'rb',
+		area: ['300px', '400px'],
+		shadeClose: true, //点击遮罩关闭
+		content: baseUrl+"/view/plotting/form",
+		title: "标绘管理",
+		skin: 'demo-class',
+		success:function(){
+			var body = layer.getChildFrame('body', layerIndex);
+			$(body).find("#id").val(properties.id);
+			$(body).find("#name").val(properties.name);
+			$(body).find("#geojson").val(geojson);
+			$(body).find("#mapId").val(mapId);
+			$(body).find("#layerId").val(layerId);
+			$(body).find("#type").val(type);
+		}
+	});
+}
+
 
 /**
  *  标绘查询
@@ -681,6 +871,100 @@ function findPlottingList(){
 };
 
 /**
+ * 图层数据
+ */
+function showLayerData(list){
+	drawnItems.clearLayers();
+	$(list).each(function(index,obj){
+		var geometry = obj.geometry;
+		var properties = obj.properties;
+		var type = obj.properties.type;
+		if (type=="Point"){
+			var latLng =eval('('+obj.latLngs+')');
+			var marker = L.marker(latLng,{id:obj.id});
+			drawnItems.addLayer(marker);
+		}else if(type=="circle"){
+			var geojson=eval('('+obj.geom+')');
+			var latLng =eval('('+obj.latLngs+')');
+			var radius = obj.radius;
+
+			var circle=L.circle(latLng,radius, {
+				color: 'red',//颜色
+				fillColor: '#f03',
+				fillOpacity:0.5,//透明度
+				dashArray: '5',  //设置虚线
+				id:obj.id
+			});
+			drawnItems.addLayer(circle);
+		}else if(type=="circlemarker"){
+			var radius = obj.radius;
+			var option={
+				id:obj.id,
+				radius:radius,
+				stroke: true,
+				color: '#3388ff',
+				weight: 4,
+				opacity: 0.5,
+				fill: true,
+				fillColor: null, //same as color by default
+				fillOpacity: 0.2,
+				clickable: true,
+				zIndexOffset: 2000 // This should be > than the highest z-index any markers
+			}
+			var latLng =eval('('+obj.latLngs+')');
+			var circle=L.circleMarker(latLng, option);
+			drawnItems.addLayer(circle);
+		}else if(type=="Polygon" || type=="polygon" || type == "MultiPolygon"){
+			var latLng = L.geoJSON(geometry).getLayers()[0].getLatLngs();
+			var polygon2 = L.polygon(latLng, {
+				color: 'green',
+				fillColor: '#f03',
+				fillOpacity: 0.5,
+				id:properties.id,
+				properties:properties
+			});
+			drawnItems.addLayer(polygon2);
+		}else if(type=="rectangle"){
+			var geojson=eval('('+obj.geom+')');
+			var latLngs =eval(obj.latLngs);
+			var rectangle = L.polygon(latLngs, {
+				clickable: true,
+				color: "#3388ff",
+				fill: true,
+				fillColor: null,
+				fillOpacity: 0.2,
+				opacity: 0.5,
+				showArea: true,
+				stroke: true,
+				weight: 4,
+				id:properties.id
+			});
+			drawnItems.addLayer(rectangle);
+		}else if(type=="Polyline" || type=="polyline" || type=="LineString" || type=="MultiLineString"){
+			var latLng = L.geoJSON(geometry).getLayers()[0].getLatLngs();
+			var polyline = L.polyline(latLng, { color: 'red',id:properties.id,properties:properties });
+			drawnItems.addLayer(polyline);
+		}else if(type=="marker"){
+			var latLng =eval('('+obj.latLngs+')');
+			var marker = L.marker(latLng,{id:obj.id});
+			drawnItems.addLayer(marker);
+		}
+		else{
+
+		}
+
+	});
+
+
+	var bound = drawnItems.getBounds();
+	if(bound.isValid()){
+		map.fitBounds(bound);
+	}
+}
+
+
+
+/**
  * 标绘保存回调处理
  */
 function addPlottingCallback(data){
@@ -688,14 +972,13 @@ function addPlottingCallback(data){
 		  content: data.msg,
 		  yes: function(index, layero){
 		    if(data.code==0){
-		    	findPlottingList();
+		    	//findPlottingList();
+				$(".map-layer-list").trigger("change");
 		    }
 		    layer.closeAll();
 		  }
 	});
-}
-
-window.addPlottingCallback=addPlottingCallback;
+};
 
 
 
@@ -792,50 +1075,40 @@ function loadgeoJSON2(geojson){
  * 表格数据
  */
 function layuiTableList(params){
-	var  toolbarDiv='<script type="text/html" id="barDemo">'+
-					  '<a class="layui-btn layui-btn-xs" lay-event="getgeojson">查看geojson</a>'+
-					  '<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>'+
-					'</script>';
+	var url = ioc.api.url.domain+"/api/map/list";
 	table.render({
 	    elem: '#plotting-list'
-	    ,url:baseUrl+'/plotting/listpage'
+	    ,url:url
 	    ,where:params
 	    ,toolbar: false
 	    ,title: '标绘数据表'
 	    ,totalRow: false
 	    ,cols: [[
-	      {field:'id', title:'ID', width:150, fixed: 'left', unresize: true, sort: true, totalRowText: '合计行'}
-	      ,{field:'type', title:'类型', width:120, edit: 'text'}
-	      ,{field:'name', title:'名称', width:150, edit: 'text'}
-	      ,{field:'radius', title:'半径', width:180, sort: true, totalRow: true}
-	      ,{field:'latLngs', title:'latLngs', width:180, edit: 'text', sort: true}
-	      ,{field:'createDate', title:'创建时间', width:180, edit: 'text', sort: true}
-	      ,{field:'updateDate', title:'更新时间', width:180, edit: 'text', sort: true}
-	      ,{field:'remarks', title:'备注', width:180, edit: 'text', sort: true}
-	      ,{fixed: 'right', title:'操作', toolbar: "#barDemo", width:150}
+	      {field:'id', title:'ID', width:280, fixed: 'left', unresize: true, sort: true, totalRowText: '合计行'}
+	      ,{field:'mapName', title:'名称'}
+	      ,{field:'mapDescribe', title:'描述', width:180, sort: true, totalRow: true}
+	      ,{field:'createDate', title:'创建时间', width:180, sort: true}
+	      ,{field:'updateDate', title:'更新时间', width:180, sort: true}
+	      ,{field:'remarks', title:'备注', width:180, sort: true}
+	      ,{fixed: 'right', title:'操作', toolbar: "#barDemo", width:200}
 	    ]]
 	    ,page: true
 	    ,response: {
 	      statusCode: 200 //重新规定成功的状态码为 200，table 组件默认为 0
 	    }
 	    ,parseData: function(res){ //将原始数据解析成 table 组件所规定的数据
-	      var code = res.code;
-	      if(code==0){
-	    	  code=200;
-	      }
 	      return {
-	        "code": code, //解析接口状态
-	        "msg": res.msg, //解析提示文本
+	        "code": 200, //解析接口状态
+	        "msg": 'ok', //解析提示文本
 	        "count": res.count, //解析数据长度
-	        "data": res.data //解析数据列表
+	        "data": res.list //解析数据列表
 	      };
 	    }
 	  });
-	
-	
-	//监听事件
+
+
+	//头工具栏事件
 	table.on('toolbar(plotting_list_event)', function(obj){
-		  debugger;
 		  var checkStatus = table.checkStatus(obj.config.id);
 		  switch(obj.event){
 		    case 'getgeojson':
@@ -848,6 +1121,34 @@ function layuiTableList(params){
 		      layer.msg('编辑');
 		    break;
 		  };
+	});
+
+	//监听行工具事件
+	table.on('tool(plotting_list_event)', function(obj){
+		var rowData = obj.data;
+		if(obj.event === 'del'){
+			layer.confirm('真的删除行么', function(index){
+
+				$.ajax({
+					url:ioc.api.url.domain+"/api/map/del",
+					method:"POST",
+					dataType:"json",
+					data:{
+						id:rowData.id
+					},
+					success:function(data){
+						if(data.code==0){
+							obj.del();
+						}
+					}
+				});
+				layer.close(index);
+			});
+		}else if(obj.event === 'edit'){
+			editMapForm(obj.data);
+		}else if(obj.event === 'list'){
+			getMapLayerList(obj.data.id);
+		}
 	});
 	
 };

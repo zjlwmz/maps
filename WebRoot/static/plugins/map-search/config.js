@@ -7,5 +7,10 @@ var ioc={
 		amap:{
 			key:"853ca443b4e7edc49849b8e36da1e70b"
 		}
+	},
+	api:{
+		url:{
+			domain:"http://localhost:8085/PictureAbove"
+		}
 	}
 };
