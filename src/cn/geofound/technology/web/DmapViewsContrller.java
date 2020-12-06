@@ -14,10 +14,44 @@ import org.nutz.mvc.annotation.Ok;
 @At("/view")
 public class DmapViewsContrller {
 
+	/**
+	 * 地图页面
+	 * @param model
+	 * @return
+	 */
+	@At("/map/form")
+	@Ok("re")
+	public Object mapForm(ViewModel model){
+		return "beetl:/platform/plotting/mapForm.html";
+	}
+
+
+
+	/**
+	 * 地图页面
+	 * @param model
+	 * @return
+	 */
+	@At("/map/layer/list")
+	@Ok("re")
+	public Object layerList(ViewModel model){
+		return "beetl:/platform/plotting/layerList.html";
+	}
+
+	/**
+	 * 地图页面
+	 * @param model
+	 * @return
+	 */
+	@At("/map/layer/form")
+	@Ok("re")
+	public Object layerForm(ViewModel model){
+		return "beetl:/platform/plotting/layerForm.html";
+	}
+
 	
 	/**
 	 * 标绘页面
-	 * @param name
 	 * @param model
 	 * @return
 	 */
