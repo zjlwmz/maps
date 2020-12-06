@@ -117,7 +117,7 @@ function init() {
 function initDom(){
 	$("#custom_tools .layui-icon").click(function(){
 		$("#plotting-container").hide();
-		$("#leaflet-draw-control").hide();
+		$("#my-map-div").hide();
 		$("#layui-table-container").hide();
 		$("#layui-comptoos-container").hide();
 		$(this).siblings().removeClass("selected");
@@ -125,7 +125,7 @@ function initDom(){
 		if($(this).hasClass("calculation")){//post函数计算
 			$("#plotting-container").show();
 		}else if($(this).hasClass("add-plotting")){//添加标绘
-			$("#leaflet-draw-control").show();
+			$("#my-map-div").show();
 		}else if($(this).hasClass("tablelist")){
 			//标绘查询
 			layuiTableList();
