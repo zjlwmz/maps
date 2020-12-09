@@ -162,6 +162,7 @@ function initDom(){
 
 						//清空地图
 						drawnItems.clearLayers();
+						$("#leaflet-draw-control").hide();
 					});
 					$(".map-layer-list").change(function(){
 						var layerId = $(this).val();
@@ -186,6 +187,14 @@ function initDom(){
 
 	$("#add-map-btn").click(function(){
 		addMapForm();
+	});
+
+
+	$("#export").click(function(){
+		var layerId = $(".map-layer-list").val();
+		if(layerId){
+			window.location.href= ioc.api.url.domain +"/api/layer/data/"+layerId+"/geojson";
+		}
 	});
 };
 
@@ -314,11 +323,31 @@ function initMap(){
 	
 	var height=$(window).height();
 	$("#map").css("height",height+"px");
-	
+
+	var labelTextCollision = new L.LabelTextCollision({
+		collisionFlg : true
+	});
+	var streetLabelsRenderer = new L.StreetLabels({
+		collisionFlg : true,
+		propertyName : 'text',
+		showLabelIf: function(layer) {
+			return true; //layer.properties.type == "primary";
+		},
+		fontStyle: {
+			dynamicFontSize: false,
+			fontSize: 12,
+			fontSizeUnit: "px",
+			lineWidth: 4.0,
+			fillStyle: "black",
+			strokeStyle: "white",
+		},
+	});
+
 	map = L.map('map',{
-		inertia:true,
+		renderer : labelTextCollision,
+		// inertia:true,
 		zoomAnimation:true,
-		zoomControl:false,
+		zoomControl:false
 	}).setView([39, 111], 4);
  
 	var zoomControl = L.control.zoom({
@@ -731,6 +760,9 @@ function openPlottingForm(geojson,type){
 }
 
 function editPlottingForm(properties,geojson,type){
+	if(null == properties){
+		return;
+	}
 	parent.layer.closeAll();
 	var mapId = $("#mymap").data("id");
 	var layerId = $(".map-layer-list").val();
@@ -810,6 +842,7 @@ function showLayerData(list){
 				fillColor: '#f03',
 				fillOpacity: 0.5,
 				id:properties.id,
+				text:properties.name,
 				properties:properties
 			});
 			drawnItems.addLayer(polygon2);
@@ -826,12 +859,13 @@ function showLayerData(list){
 				showArea: true,
 				stroke: true,
 				weight: 4,
+				text:properties.name,
 				id:properties.id
 			});
 			drawnItems.addLayer(rectangle);
 		}else if(type=="Polyline" || type=="polyline" || type=="LineString" || type=="MultiLineString"){
 			var latLng = L.geoJSON(geometry).getLayers()[0].getLatLngs();
-			var polyline = L.polyline(latLng, { color: 'red',id:properties.id,properties:properties });
+			var polyline = L.polyline(latLng, { color: 'red',id:properties.id,properties:properties,text:properties.name });
 			drawnItems.addLayer(polyline);
 		}else if(type=="marker"){
 			var latLng =eval('('+obj.latLngs+')');
