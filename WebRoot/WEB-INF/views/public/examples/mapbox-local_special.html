@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>专题地图2222</title>
+
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+    <meta http-equiv="description" content="this is my page">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script type="text/javascript" src="${base!}/static/plugins/jquery/jquery-1.8.2.min.js"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.1.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.1.1/mapbox-gl.css' rel='stylesheet' />
+
+    <style type="text/css">
+        html, body{
+            margin: 0px;
+            padding: 0px;
+        }
+        #map{
+            width: 100%;
+            height: 500px;
+        }
+    </style>
+</head>
+
+<body>
+<div id="map">
+
+</div>
+<script>
+    let specialMapUrl = "${base!}/static/style/special.map.json";
+    let baseMapUrl = '${base!}/static/style/base.map.json';
+    var mapboxglMap;
+    $(document).ready(function(){
+        var baseMapStyle = getDataInfo(baseMapUrl);
+        var specialMapStyle = getDataInfo(specialMapUrl);
+        //1、合并专题图的数据源到底图样式文件中
+        //Object.assign(baseMapStyle.sources, specialMapStyle.sources);
+        Object.assign(specialMapStyle.sources,baseMapStyle.sources);
+
+        var height=$(window).height();
+        $("#map").css("height",height+"px");
+        mapboxgl.accessToken = 'pk.eyJ1IjoiemhhbmdqaWFsdSIsImEiOiJjajRvOW44eDcwOGtqMzNxNnFvemQ2ZTlyIn0.i01rCdfpdvooSqkHQBxPBA';
+
+        mapboxglMap = new mapboxgl.Map({
+            container: 'map', // container id
+            style:baseMapStyle,
+            center: [116.4624100, 39.9202460], // starting position [lng, lat]
+            zoom: 15 // starting zoom
+        });
+        //2、裁剪专题图雪碧图，绘制到各canvas画图中,并转base64,添加到地图中
+        addImages(specialMapStyle.sprite+"@2x");
+
+
+        //3、地图加载完成后，将专题图样式加载到地图中
+        mapboxglMap.on('load', function (res) {
+            for (let item of specialMapStyle.layers) {
+                if (!mapboxglMap.getLayer(item.id)) {
+                    mapboxglMap.addLayer(item);
+                }
+            }
+        });
+
+
+    });
+
+    function getDataInfo (url, param, type) {
+        var $data = [];
+        $.ajax({
+            type: type || 'get',
+            url: url,
+            async: false,
+            data: param || {},
+            dataType: 'json',
+            success: function (data) {
+                $data = data;
+            }
+        });
+        return $data;
+    };
+
+
+    function addImages(spritePath) {
+        jQuery.get(spritePath+'.json').then(spriteJson => {
+            var img = new Image();
+            img.onload = function () {
+                Object.keys(spriteJson).forEach(key => {
+                    let spriteItem = spriteJson[key];
+                    let { x, y, width, height } = spriteItem;
+                    let canvas = createCavans(width, height);
+                    let context = canvas.getContext('2d');
+                    context.drawImage(img, x, y, width, height, 0, 0, width, height);
+                    // 单位雪碧图项，转base64字符串
+                    let base64Url = canvas.toDataURL('image/png');
+                    mapboxglMap.loadImage(base64Url, (error, simg) => {
+                        if (!mapboxglMap.hasImage(key)) {
+                            mapboxglMap.addImage(key, simg);
+                        }
+                    })
+                })
+            }
+            img.crossOrigin = "anonymous";
+            img.src = spritePath+'.png';
+        })
+    };
+
+    function createCavans(width, height) {
+        var canvas = document.createElement('canvas');
+        canvas.width = width
+        canvas.height = height;
+        return canvas;
+    };
+
+</script>
+
+</body>
+</html>

@@ -55,7 +55,7 @@
         function updatePlotting(formdata){
             var index = layer.load(0, {shade: false});
             $.ajax({
-                url:ioc.api.url.domain+"/api/map/add",
+                url:ioc.api.url.domain+"/api/map/save",
                 method:"POST",
                 dataType:"json",
                 data:formdata,

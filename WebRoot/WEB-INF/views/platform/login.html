@@ -11,7 +11,13 @@
     <meta name="author" content="" />
     <meta name="Copyright" content="" />
     <link rel="stylesheet" href="${base!}/static/css/login.css">
-
+    <link rel="stylesheet" href="${base!}/static/common/common.css">
+    <link rel="stylesheet" href="${base!}/static/common/jeesite.css">
+    <style>
+        input:-webkit-autofill {
+            box-shadow: 0 0 1000px 1000px white inset !important;
+        }
+    </style>
 </head>
 <body>
 <form method="post" id="loginForm" action="${base!}/login">
@@ -23,7 +29,7 @@
                 <input name="loginname" id="login_name" value="" name="login_name" type="text" class="form_input required" placeholder="请输入用户名"  autocomplete="off" />
             </div>
             <div class="login_pwd">
-                <input name="password" id="login_pwd" name="login_pwd" type="password" class="form_input required" placeholder="请输入密码"  autocomplete="off"/>
+                <input name="password" id="login_pwd" name="login_pwd" type="password" class="form_input required" placeholder="请输入密码"  autocomplete="new-password"/>
             </div>
             <div class="login_help">
                 <label>
@@ -43,6 +49,13 @@
 <script src="${base!}/static/common/jeesite.js"></script>
 <script>
     $(document).ready(function () {
+        setTimeout(function removeReadonly(){
+            var username=document.getElementById("login_name");
+            var password=document.getElementById("login_pwd");
+            username.removeAttribute("readonly");
+            password.removeAttribute("readonly");
+        },1000);
+
         $("#loginForm").validate({
             ignore: [],
             submitHandler: function(form){

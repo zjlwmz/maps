@@ -67,12 +67,27 @@
 		border-radius: 15px;
 	}
 
+	#export{
+		margin-left: 10px;
+		position: absolute;
+		left: 394px;
+		z-index: 100000;
+		top: 5px;
+	}
+	#import{
+		margin-left: 10px;
+		position: absolute;
+		left: 467px;
+		top: 5px;
+		z-index: 100000;
+	}
 </style>
 
 
 <script type="text/javascript" src="${base!}/static/plugins/utils/GPS.js"></script>
 <script type="text/javascript" src="${base!}/static/plugins/layui-v2.5.4/layui/layui.js"></script>
 <script type="text/javascript" src="${base!}/static/plugins/leaflet/leaflet.js"></script>
+
 <script type="text/javascript" src="${base!}/static/plugins/leaflet-plug/Leaflet.MousePosition-master/src/L.Control.MousePosition.js"></script>
 <script src="${base!}/static/plugins/turfjs/turf.min.js"></script>
 
@@ -80,10 +95,16 @@
 <link rel="stylesheet" href="${base!}/static/plugins/leaflet-plug/Leaflet.draw-0.4.14/leaflet.draw-src.css" type="text/css"></link>
 <script type="text/javascript" src="${base!}/static/plugins/leaflet-plug/Leaflet.draw-0.4.14/leaflet.draw-src.js?t=1.01"></script>
 
+
+<script src="${base!}/static/plugins/Leaflet.streetlabels/lisbon.js"></script>
+<script src="${base!}/static/plugins/Leaflet.streetlabels/oporto.js"></script>
+<script src="${base!}/static/plugins/leaflet-plug/Leaflet.LabelTextCollision/L.LabelTextCollision.js"></script>
+<script src="${base!}/static/plugins/Leaflet.streetlabels/Leaflet.streetlabels.src.js"></script>
+
 <script type="text/javascript" src="${base!}/static/plugins/map-search/config.js"></script>
 <script type="text/javascript" src="${base!}/static/plugins/map-search/mapServerUtils.js?t=1.23"></script>
 
-<script type="text/javascript" src="${base!}/static/plugins/map-search/postgisTools.js?t=1.681"></script>
+<script type="text/javascript" src="${base!}/static/plugins/map-search/postgisTools.js?t=1.684"></script>
 
 <script type="text/javascript">var baseUrl="${base!}"</script>
 
@@ -214,6 +235,10 @@
 				<li>地图3</li>
 			</ul>
 		</div>
+	</div>
+	<div id="user-per-div">
+		<button id="export" type="button" class="layui-btn">导出</button>
+		<button id="import" type="button" class="layui-btn">导入</button>
 	</div>
 	
 	<div id="map"></div>
