@@ -31,7 +31,7 @@
         // https://gist.github.com/ryanbaumann/a7d970386ce59d11c16278b90dde094d
             'type': 'geojson',
             'data':
-                '${base!}/examples/testdata/jxm_thematic2.geojson'
+                '${base!}/examples/testdata/jxm_thematic3.geojson'
         });
         map.addLayer({
             'id': 'room-extrusion',
@@ -45,10 +45,10 @@
                 'fill-extrusion-color': ['get', 'color'],
 
                 // Get fill-extrusion-height from the source 'height' property.
-                'fill-extrusion-height': ['get', 'height'],
+                'fill-extrusion-height': ['get', 'base_height'],
 
                 // Get fill-extrusion-base from the source 'base_height' property.
-                'fill-extrusion-base': ['get', 'base_height'],
+                'fill-extrusion-base': ['get', 'height'],
 
                 // Make extrusions slightly opaque for see through indoor walls.
                 'fill-extrusion-opacity': 0.9
