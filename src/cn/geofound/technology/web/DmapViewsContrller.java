@@ -14,6 +14,19 @@ import org.nutz.mvc.annotation.Ok;
 @At("/view")
 public class DmapViewsContrller {
 
+
+	/**
+	 * 地图页面
+	 * @param model
+	 * @return
+	 */
+	@At("/basemap/form")
+	@Ok("re")
+	public Object basemapForm(ViewModel model){
+		return "beetl:/platform/basemap/layerForm.html";
+	}
+
+
 	/**
 	 * 地图页面
 	 * @param model
