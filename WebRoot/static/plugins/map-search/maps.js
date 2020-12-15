@@ -104,85 +104,131 @@ function initMap(){
 	
 	
 	//google 矢量地图
-	var googleVectorUrl="https://localhost:8080/TileService/MapService/getTile.nut?x={x}&y={y}&z={z}";
-	googleVectorUrl="https://mt3.google.cn/vt/lyrs=m@207000000&hl=zh-CN&gl=CN&src=app&s=Galile&x={x}&y={y}&z={z}";
+	var googleVectorUrl="https://mt3.google.cn/vt/lyrs=m@207000000&hl=zh-CN&gl=CN&src=app&s=Galile&x={x}&y={y}&z={z}";
 	var googleVectorMap= L.tileLayer(googleVectorUrl, {id: 'mapbox.light', attribution: "Google 矢量地图",maxZoom:20});
 	googleVectorMap.addTo(map);
-	
-	//google 影像地图
-	var googleImageUrl="https://localhost:8080/TileService/ImageryService/getTile.nut?x={x}&y={y}&z={z}";
-	googleImageUrl="https://mt2.google.cn/maps/vt?lyrs=s@804&gl=cn&x={x}&y={y}&z={z}";
-	var googleImageMap= L.tileLayer(googleImageUrl, {id: 'mapbox.light', attribution: "Google 矢量地图",maxZoom:20});
-	
-	
-	//高德地图
-	var gaoDeiImageUrl="https://wprd03.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}&scl=1&ltype=3";
-	var gaoDeiImageMap= L.tileLayer(gaoDeiImageUrl, {id: 'mapbox.light', attribution: "高德矢量地图"});
 
-	//高德地图
+	//google 地形地图
+	var google_terrain_url="http://mt0.google.cn/vt/lyrs=t@132,r@292000000&hl=zh-CN&gl=cn&src=app&x={x}&y={y}&z={z}&scale=2&s=Gal";
+	var googleterrainMap= L.tileLayer(google_terrain_url, {id: 'mapbox.light', attribution: "Google 矢量地图",maxZoom:20});
+
+
+	//mapbox 地图
+	var mapbox_map_url="https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw";
+	var mapboxVectorMap= L.tileLayer(mapbox_map_url, {id: 'mapbox.light', attribution: "Google 矢量地图",maxZoom:20});
+
+
+
+	//arcgis 地图
+	var arcgis_map_url="http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}";
+	var arcgisVectorMap= L.tileLayer(arcgis_map_url, {id: 'mapbox.light', attribution: "arcgis 矢量地图",maxZoom:20});
+
+
+	//arcgis PurplishBlue 地图
+	var arcgis_map_color_url="http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}";
+	var arcgisColorVectorMap= L.tileLayer(arcgis_map_color_url, {id: 'mapbox.light', attribution: "arcgis 矢量地图",maxZoom:20});
+
+
+	var arcgis_map_gray_url="http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetGray/MapServer/tile/{z}/{y}/{x}";
+	var arcgisGrayVectorMap= L.tileLayer(arcgis_map_gray_url, {id: 'mapbox.light', attribution: "arcgis 矢量地图",maxZoom:20});
+
+
+	var arcgis_map_warm_url="http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetWarm/MapServer/tile/{z}/{y}/{x}";
+	var arcgisWarmVectorMap= L.tileLayer(arcgis_map_warm_url, {id: 'mapbox.light', attribution: "arcgis 矢量地图",maxZoom:20});
+
+	var arcgis_map_cold_url="http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetCold/MapServer/tile/{z}/{y}/{x}";
+	var arcgisColdVectorMap= L.tileLayer(arcgis_map_cold_url, {id: 'mapbox.light', attribution: "arcgis 矢量地图",maxZoom:20});
+
+
+
+	//arcgis 卫星地图
+	var arcgis_map_satellite_url="http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
+	var arcgisGraysatelliteMap= L.tileLayer(arcgis_map_satellite_url, {id: 'mapbox.light', attribution: "arcgis 矢量地图",maxZoom:20});
+
+	var arcgis_map_satellite_address_url="https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}";
+	var arcgisGraysatelliteAddressMap= L.tileLayer(arcgis_map_satellite_address_url, {id: 'mapbox.light', attribution: "arcgis 矢量地图",maxZoom:20});
+
+
+
+	//google 影像地图
+	var google_satellite_image_url="https://mt2.google.cn/maps/vt?lyrs=s@804&gl=cn&x={x}&y={y}&z={z}";
+	var googleImageMap= L.tileLayer(google_satellite_image_url, {id: 'mapbox.light', attribution: "Google 矢量地图",maxZoom:20});
+	
+	
+	//高德街道
+	var gaoDeUrl="http://webrd03.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}";
+	var gaoDeMap= L.tileLayer(gaoDeUrl, {id: 'appmaptile.light', attribution: "高德街道"});
+
+	//高德卫星
+	var gaoDe_SatelliteUrl="http://webst03.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}";
+	var gaoDe_SatelliteMap= L.tileLayer(gaoDe_SatelliteUrl, {id: 'appmaptile.light', attribution: "高德卫星"});
+	//高德卫星 - 地名地址
+	var gaoDe_Satellite_address = "http://webst03.is.autonavi.com/appmaptile?style=8&x={x}&y={y}&z={z}";
+	var gaoDe_SatelliteMapAddress= L.tileLayer(gaoDe_Satellite_address, {id: 'appmaptile.light', attribution: "高德卫星"});
+
+
+	//天地图街道
+	var td_image_url="//t1.tianditu.gov.cn/DataServer?T=vec_w&X={x}&Y={y}&L={z}&tk=b684b9e680b3efcc4c517800bd863a75";
+	var tdMap= L.tileLayer(td_image_url, {id: 'mapbox.light', attribution: "天地图街道",maxZoom:20});
+
+	//天地图街道-地名
+	var td_image_address_url="//t1.tianditu.gov.cn/DataServer?T=cva_w&X={x}&Y={y}&L={z}&tk=b684b9e680b3efcc4c517800bd863a75";
+	var td_addressMap= L.tileLayer(td_image_address_url, {id: 'mapbox.light', attribution: "天地图街道-地名",maxZoom:20});
+
+	//天地图-卫星
+	var td_wx_image_url="//t1.tianditu.gov.cn/DataServer?T=img_w&X={x}&Y={y}&L={z}&tk=b684b9e680b3efcc4c517800bd863a75";
+	var td_wxMap= L.tileLayer(td_wx_image_url, {id: 'mapbox.light', attribution: "天地图街道",maxZoom:20});
+
+	//天地图-卫星-地名
+	var td_wx_image_address_url="//t1.tianditu.gov.cn/DataServer?T=cia_w&X={x}&Y={y}&L={z}&tk=b684b9e680b3efcc4c517800bd863a75";
+	var td_wx_addressMap= L.tileLayer(td_wx_image_address_url, {id: 'mapbox.light', attribution: "天地图街道",maxZoom:20});
+
+
+	//天地图-地形
+	var td_dx_image_url="//t1.tianditu.gov.cn/DataServer?T=ter_w&X={x}&Y={y}&L={z}&tk=b684b9e680b3efcc4c517800bd863a75";
+	var td_dxMap= L.tileLayer(td_dx_image_url, {id: 'mapbox.light', attribution: "天地图街道",maxZoom:20});
+
+	//天地图-地形-地名
+	var td_dx_image_address_url="//t1.tianditu.gov.cn/DataServer?T=cta_w&X={x}&Y={y}&L={z}&tk=b684b9e680b3efcc4c517800bd863a75";
+	var td_dx_addressMap= L.tileLayer(td_dx_image_address_url, {id: 'mapbox.light', attribution: "天地图街道",maxZoom:20});
+
+
+
+	//日本地图
 	var jpurl="http://maps.gsi.go.jp/xyz/std/{z}/{x}/{y}.png?_=20200402a";
 	var jpMap= L.tileLayer(jpurl, {id: 'mapbox.light', attribution: "jp"});
 
 	//天地图影像
 	var tdtImage = "http://t2.tianditu.gov.cn/img_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=w&TileMatrix={z}&TileRow={y}&TileCol={x}&style=default&format=tiles&tk=b684b9e680b3efcc4c517800bd863a75";
 	var tdtMap= L.tileLayer(tdtImage, {id: 'tianditu.light', attribution: "jp"});
-	
-	
-	//geoserver wms
-	var wmsLayer= L.tileLayer.wms("http://192.168.1.127:8080/geoserver/jp/wms?", {
-        layers: 'jp:test001',//需要加载的图层
-        format: 'image/png',//返回的数据格式
-        transparent: true
-        // crs:L.CRS.EPSG404000
-        // crs: L.CRS.EPSG4326
-    });
-	
-	//geoserver wms
-	var wmsLayer2= L.tileLayer.wms("http://39.98.231.144:8080/geoserver/et/wms?", {
-		    'VERSION': '1.1.1', 
-		    layers: 'et:haihe-1km_20180101_TMAX1562670927',
-	        format: 'image/png',//返回的数据格式
-	        exceptions: 'application/vnd.ogc.se_inimage',
-	        transparent: true
-	        //crs:L.CRS.EPSG404000
-	        //crs: L.CRS.EPSG4326
-	 });
-	//geoserver wms
-	var wmsLayer21= L.tileLayer.wms("http://39.98.231.144:8080/geoserver/et/wms?", {
-		    'VERSION': '1.1.1', 
-		    layers: 'et:haihe-terra_MODIS-1km_20180101_qn1562754021',
-	        format: 'image/png',//返回的数据格式
-	        exceptions: 'application/vnd.ogc.se_inimage',
-	        transparent: true
-	        //crs:L.CRS.EPSG404000
-	        //crs: L.CRS.EPSG4326
-	 });
-	
-	
-	//geoserver wms
-	var wmsLayer3= L.tileLayer.wms("http://39.98.231.144:8080/geoserver/etwatch/wms?", {
-		    'VERSION': '1.1.1', 
-	        layers: 'etwatch:haihe-terra_MODIS-1km_20180101_qn_1563795068599',//需要加载的图层
-	        format: 'image/png',//返回的数据格式
-	        transparent: true,
-	        exceptions: 'application/vnd.ogc.se_inimage'
-	        //crs:L.CRS.EPSG404000
-	        //crs: L.CRS.EPSG4326
-	    });
+
+
 	
    var layers={
-		   wms:wmsLayer,
-		   wms2:wmsLayer2,
-		   wms21:wmsLayer21,
-		   wms3:wmsLayer3
+	   		"高德地名":gaoDe_SatelliteMapAddress,
+	   		"arcgis地名":arcgisGraysatelliteAddressMap,
+	   		"天地图地名":td_addressMap,
+	   		"天地图卫星地名":td_wx_addressMap,
+	   		"天地图地形地名":td_dx_addressMap
    };
 		
 	
 	var baseLayers = {
 		"公开地图":osmMap,
 		"谷歌矢量": googleVectorMap,
+		"谷歌地形":googleterrainMap,
 		"谷歌影像": googleImageMap,
-		"高德矢量":gaoDeiImageMap,
+		"天地图街道":tdMap,
+		"天地图卫星":td_wxMap,
+		"天地图地形":td_dxMap,
+		"高德街道":gaoDeMap,
+		"高德卫星":gaoDe_SatelliteMap,
+		"mapbox地图":mapboxVectorMap,
+		"arcgis地图":arcgisVectorMap,
+		"arcgis卫星":arcgisGraysatelliteMap,
+		"PurplishBlue":arcgisColorVectorMap,
+		"gray":arcgisGrayVectorMap,
+		"warm":arcgisWarmVectorMap,
 		"日本地图":jpMap,
 		"天地图影像":tdtMap
 	};
@@ -725,7 +771,28 @@ function findLocationXY(keyword) {
 					
 					map.setView([xy[1], xy[0]],map.getMaxZoom());
 					marker.openPopup();
+				}else{
+					var xy = keyword.split(",");
+					var marker = L.marker([ xy[1], xy[0] ]);
+					var lat=parseFloat(xy[1]).toFixed(7);
+					var lon=parseFloat(xy[0]).toFixed(7);
+
+					locationLayer.addLayer(marker);
+					map.panTo([ xy[1], xy[0] ]);
+
+					map.setView([xy[1], xy[0]],map.getMaxZoom());
 				}
+
+			}else{
+				var xy = keyword.split(",");
+				var marker = L.marker([ xy[1], xy[0] ]);
+				var lat=parseFloat(xy[1]).toFixed(7);
+				var lon=parseFloat(xy[0]).toFixed(7);
+
+				locationLayer.addLayer(marker);
+				map.panTo([ xy[1], xy[0] ]);
+
+				map.setView([xy[1], xy[0]],map.getMaxZoom());
 
 			}
 			

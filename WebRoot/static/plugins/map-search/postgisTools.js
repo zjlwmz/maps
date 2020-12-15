@@ -10,6 +10,7 @@ var routeStartLayer=null,routeEndLayer=null,resultLayer=null,drawnItems=null;
 // 地图marker查询
 var searchMarkerLayer=null;
 
+var layerControl;
 /**
  * 查询中
  */
@@ -103,9 +104,6 @@ function init() {
 	//标绘工具
 	drawTools();
 	
-	//标绘查询
-	//findPlottingList();
-	
 	//标绘表格数据查询
 	layuiTableList();
 };
@@ -163,6 +161,10 @@ function initDom(){
 						//清空地图
 						drawnItems.clearLayers();
 						$("#leaflet-draw-control").hide();
+						if(labelTextCollision._ctx){
+							labelTextCollision._update();
+						}
+
 					});
 					$(".map-layer-list").change(function(){
 						var layerId = $(this).val();
@@ -172,6 +174,9 @@ function initDom(){
 						}else{
 							drawnItems.clearLayers();
 							$("#leaflet-draw-control").hide();
+							if(labelTextCollision._ctx){
+								labelTextCollision._update();
+							}
 						}
 					});
 
@@ -196,7 +201,52 @@ function initDom(){
 			window.location.href= ioc.api.url.domain +"/api/layer/data/"+layerId+"/geojson";
 		}
 	});
+
+	$("#export-shpfile").click(function(){
+		var layerId = $(".map-layer-list").val();
+		if(layerId){
+			window.location.href= ioc.api.url.domain +"/api/layer/data/"+layerId+"/shpfile";
+		}
+	});
+
+	$("#add-base-layer").click(function(){
+		addbaseMapForm();
+	});
 };
+
+
+function addbaseMapForm(properties){
+	parent.layer.closeAll();
+	var layerIndex = parent.layer.open({
+		type: 2,
+		maxmin: true,
+		// shade:0,
+		offset: 'auto',
+		area: ['520px', '400px'],
+		shadeClose: true, //点击遮罩关闭
+		content: baseUrl+"/view/basemap/form",
+		title: "XYZ Tiles",
+		skin: 'demo-class',
+		success:function(){
+			var body = layer.getChildFrame('body', layerIndex);
+			$(body).find("#layerIndex").val(layerIndex);
+		}
+	});
+};
+
+function addMapBaseToMap(layerdata) {
+	console.log(layerdata);
+	top.layer.close(layerdata.layerIndex);
+	var tileLayer= L.tileLayer(layerdata.url, {id: layerdata.name, attribution: "扩展图层",maxZoom:20});
+	if(layerdata.mapTye == 0){
+		layerControl.addBaseLayer(tileLayer,layerdata.name);
+	}else{
+		layerControl.addOverlay(tileLayer,layerdata.name);
+	}
+
+}
+
+
 
 
 
@@ -217,6 +267,7 @@ function addMapForm(properties){
 		}
 	});
 };
+
 function reloadMapList(){
 	table.reload('plotting-list');
 };
@@ -315,7 +366,7 @@ function getLayerData(layerId){
 	});
 }
 
-
+var labelTextCollision;
 /**
  * 地图初始化
  */
@@ -324,7 +375,7 @@ function initMap(){
 	var height=$(window).height();
 	$("#map").css("height",height+"px");
 
-	var labelTextCollision = new L.LabelTextCollision({
+	labelTextCollision = new L.LabelTextCollision({
 		collisionFlg : true
 	});
 	var streetLabelsRenderer = new L.StreetLabels({
@@ -347,7 +398,24 @@ function initMap(){
 		renderer : labelTextCollision,
 		// inertia:true,
 		zoomAnimation:true,
-		zoomControl:false
+		zoomControl:false,
+		contextmenu: true,
+		contextmenuWidth: 140,
+		contextmenuItems: [{
+			text: 'Show coordinates',
+			callback: showCoordinates
+		}, {
+			text: 'Center map here',
+			callback: centerMap
+		}, '-', {
+			text: 'Zoom in',
+			icon: 'images/zoom-in.png',
+			callback: zoomIn
+		}, {
+			text: 'Zoom out',
+			icon: 'images/zoom-out.png',
+			callback: zoomOut
+		}]
 	}).setView([39, 111], 4);
  
 	var zoomControl = L.control.zoom({
@@ -416,8 +484,8 @@ function initMap(){
 			"drawnItems":drawnItems,
 			"resultLayer":resultLayer
 	};
-	L.control.layers(baseLayers,myLayers,{ position: 'topright', collapsed: false }).addTo(map);
-	
+	layerControl = L.control.layers(baseLayers,myLayers,{ position: 'topright', collapsed: true }).addTo(map);
+
 	L.control.mousePosition({
 		position: 'bottomright'
 	}).addTo(map);
@@ -426,8 +494,12 @@ function initMap(){
 	 * 比例尺
 	 */
 	L.control.scale({position: 'bottomright'}).addTo(map);
-	
-	
+
+
+	/**
+	 * 高清打印
+	 */
+	L.control.bigImage().addTo(map);
 	
 	resiezeMap();
 };
@@ -436,6 +508,24 @@ function is_map_serach(){
 	var isFocus=$("#search").is(":focus");
 	return isFocus;
 }
+
+
+function showCoordinates (e) {
+	alert(e.latlng);
+}
+
+function centerMap (e) {
+	map.panTo(e.latlng);
+}
+
+function zoomIn (e) {
+	map.zoomIn();
+}
+
+function zoomOut (e) {
+	map.zoomOut();
+}
+
 
 /**
  * 地图点击事件
@@ -843,26 +933,14 @@ function showLayerData(list){
 				fillOpacity: 0.5,
 				id:properties.id,
 				text:properties.name,
-				properties:properties
+				properties:properties,
+				contextmenu: true,
+				contextmenuInheritItems: false,
+				contextmenuItems: [{
+					text: 'Marker item'
+				}]
 			});
 			drawnItems.addLayer(polygon2);
-		}else if(type=="rectangle"){
-			var geojson=eval('('+obj.geom+')');
-			var latLngs =eval(obj.latLngs);
-			var rectangle = L.polygon(latLngs, {
-				clickable: true,
-				color: "#3388ff",
-				fill: true,
-				fillColor: null,
-				fillOpacity: 0.2,
-				opacity: 0.5,
-				showArea: true,
-				stroke: true,
-				weight: 4,
-				text:properties.name,
-				id:properties.id
-			});
-			drawnItems.addLayer(rectangle);
 		}else if(type=="Polyline" || type=="polyline" || type=="LineString" || type=="MultiLineString"){
 			var latLng = L.geoJSON(geometry).getLayers()[0].getLatLngs();
 			var polyline = L.polyline(latLng, { color: 'red',id:properties.id,properties:properties,text:properties.name });
@@ -895,7 +973,6 @@ function addPlottingCallback(data){
 		  content: data.msg,
 		  yes: function(index, layero){
 		    if(data.code==0){
-		    	//findPlottingList();
 				$(".map-layer-list").trigger("change");
 		    }
 		    layer.closeAll();

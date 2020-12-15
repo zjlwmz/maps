@@ -11,6 +11,7 @@ var ioc={
 	api:{
 		url:{
 			domain:"http://39.106.68.85:8080/PictureAbove"
+			// domain:"http://localhost:8085/PictureAbove"
 		}
 	}
 };
