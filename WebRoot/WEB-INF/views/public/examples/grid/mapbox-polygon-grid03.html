@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>3d 格网</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+
+    mapboxgl.accessToken = 'pk.eyJ1IjoiemhhbmdqaWFsdSIsImEiOiJjajRvOW44eDcwOGtqMzNxNnFvemQ2ZTlyIn0.i01rCdfpdvooSqkHQBxPBA';
+
+
+    var map;
+    //蓝黑地图
+    function create_grayMap(){
+        map = new mapboxgl.Map({
+            container: 'map', // container id
+            style:{
+                "version": 8,
+                "sprite": "http://39.106.68.85:8080/mapbox/cyq/sprite/sprite/",
+                "glyphs": "http://39.106.68.85:8080/mapbox/cyq/glyphs/{fontstack}/{range}.pbf",
+                "sources": {
+                    "438af1ba-dbe4-4838-8553-8f84e50859e0": {
+                        "type": "vector",
+                        "tiles": [
+                            "http://39.106.68.85:8080/mapbox/cyq/tiles/{z}/{x}/{y}.pbf"
+                        ]
+                    }
+                },
+                "layers": [
+                    {
+                        "id": "background",
+                        "interactive": true,
+                        "paint": {
+                            "background-color": "#132230"
+                        },
+                        "type": "background",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0"
+                    },
+                    {
+                        "id": "city_normal_region",
+                        "type": "fill",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "region",
+                        "layout": {},
+                        "paint": {
+                            "fill-color": [
+                                "match",
+                                [
+                                    "get",
+                                    "labels"
+                                ],
+                                "regions:green",
+                                "#132230",
+                                "water",
+                                "#0f3360",
+                                "regions:edu",
+                                "#19202f",
+                                "regions:public",
+                                "#142030",
+                                "regions:traffic",
+                                "#152437",
+                                "regions:sports",
+                                "#191e2a",
+                                "regions:business",
+                                "#182033",
+                                "regions:parkingLot",
+                                "#17202f",
+                                "regions:scenicSpot",
+                                "#0b202a",
+                                "regions:health",
+                                "#1f1f2d",
+                                [
+                                    "string",
+                                    [
+                                        "get",
+                                        "style"
+                                    ]
+                                ]
+                            ],
+                            "fill-outline-color": [
+                                "match",
+                                [
+                                    "get",
+                                    "labels"
+                                ],
+                                "regions:green",
+                                "#132230",
+                                "water",
+                                "#0f3360",
+                                "regions:edu",
+                                "#19202f",
+                                "regions:public",
+                                "#142030",
+                                "regions:traffic",
+                                "#152437",
+                                "regions:sports",
+                                "#191e2a",
+                                "regions:business",
+                                "#182033",
+                                "regions:parkingLot",
+                                "#17202f",
+                                "regions:scenicSpot",
+                                "#0b202a",
+                                "regions:health",
+                                "#1f1f2d",
+                                [
+                                    "string",
+                                    [
+                                        "get",
+                                        "style"
+                                    ]
+                                ]
+                            ],
+                            "fill-opacity": 1,
+                            "fill-antialias": true
+                        },
+                        "filter": [
+                            "in",
+                            "labels",
+                            "regions:green",
+                            "regions:business",
+                            "regions:edu",
+                            "regions:public",
+                            "regions:health",
+                            "regions:scenicSpot",
+                            "regions:parkingLot",
+                            "regions:sports",
+                            "regions:traffic",
+                            "water"
+                        ]
+                    },
+                    {
+                        "id": "city_normal_line",
+                        "type": "line",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "road",
+                        "layout": {
+                            "line-join": "bevel",
+                            "line-cap": "butt"
+                        },
+                        "paint": {
+                            "line-color": [
+                                "string",
+                                [
+                                    "get",
+                                    "fillStyle"
+                                ]
+                            ],
+                            "line-width": [
+                                "number",
+                                [
+                                    "get",
+                                    "width"
+                                ]
+                            ],
+                            "line-opacity": 1
+                        },
+                        "filter": [
+                            "in",
+                            "labels",
+                            "borders:foreign",
+                            "borders:China",
+                            "borders:provincial"
+                        ]
+                    },
+                    {
+                        "id": "city_normal_region_subway",
+                        "type": "fill",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "region",
+                        "layout": {},
+                        "paint": {
+                            "fill-color": "#8099b4",
+                            "fill-outline-color": "#8099b4",
+                            "fill-opacity": 1,
+                            "fill-antialias": true
+                        },
+                        "filter": [
+                            "==",
+                            "labels",
+                            "regions:subway"
+                        ]
+                    },
+                    {
+                        "id": "city_normal_line_underPass",
+                        "type": "line",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "road",
+                        "layout": {
+                            "line-join": "bevel",
+                            "line-cap": "butt"
+                        },
+                        "paint": {
+                            "line-color": "#889097",
+                            "line-width": [
+                                "number",
+                                [
+                                    "get",
+                                    "width"
+                                ]
+                            ],
+                            "line-opacity": 1
+                        },
+                        "filter": [
+                            "==",
+                            "labels",
+                            "roads:underPass"
+                        ]
+                    },
+                    {
+                        "id": "city_normal_line_railway_stroke",
+                        "type": "line",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "road",
+                        "layout": {
+                            "line-join": "bevel",
+                            "line-cap": "butt"
+                        },
+                        "paint": {
+                            "line-color": "#064172",
+                            "line-width": 3,
+                            "line-opacity": 1
+                        },
+                        "filter": [
+                            "==",
+                            "labels",
+                            "roads:railway"
+                        ]
+                    },
+                    {
+                        "id": "city_normal_line_railway_fill",
+                        "type": "line",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "road",
+                        "layout": {
+                            "line-join": "bevel",
+                            "line-cap": "butt"
+                        },
+                        "paint": {
+                            "line-color": "#2d313a",
+                            "line-width": 2,
+                            "line-opacity": 1,
+                            "line-dasharray": [
+                                6,
+                                6
+                            ]
+                        },
+                        "filter": [
+                            "==",
+                            "labels",
+                            "roads:railway"
+                        ]
+                    },
+                    {
+                        "id": "city_normal_line_highSpeedRailway_stroke",
+                        "type": "line",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "road",
+                        "layout": {
+                            "line-join": "bevel",
+                            "line-cap": "butt"
+                        },
+                        "paint": {
+                            "line-color": "#0099ff",
+                            "line-width": 3,
+                            "line-opacity": 1
+                        },
+                        "filter": [
+                            "==",
+                            "labels",
+                            "roads:highSpeedRailway"
+                        ]
+                    },
+                    {
+                        "id": "city_normal_line_highSpeedRailway_fill",
+                        "type": "line",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "road",
+                        "layout": {
+                            "line-join": "bevel",
+                            "line-cap": "butt"
+                        },
+                        "paint": {
+                            "line-color": "#2d313a",
+                            "line-width": 2,
+                            "line-opacity": 1,
+                            "line-dasharray": [
+                                6,
+                                6
+                            ]
+                        },
+                        "filter": [
+                            "==",
+                            "labels",
+                            "roads:highSpeedRailway"
+                        ]
+                    },
+                    {
+                        "id": "city_normal_line_road",
+                        "type": "line",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "road",
+                        "layout": {
+                            "line-join": "bevel",
+                            "line-cap": "butt"
+                        },
+                        "paint": {
+                            "line-width": [
+                                "number",
+                                [
+                                    "get",
+                                    "width"
+                                ]
+                            ],
+                            "line-color": [
+                                "match",
+                                [
+                                    "get",
+                                    "labels"
+                                ],
+                                "roads:highWay",
+                                "#2c415e",
+                                "roads:ringRoad",
+                                "#2c415e",
+                                "roads:nationalRoad",
+                                "#39506e",
+                                "roads:provincialRoad",
+                                "#313a56",
+                                "roads:secondaryRoad",
+                                "#313a56",
+                                "roads:levelThreeRoad",
+                                "#353d5b",
+                                "roads:levelFourRoad",
+                                "#2c384c",
+                                [
+                                    "string",
+                                    [
+                                        "get",
+                                        "fillStyle"
+                                    ]
+                                ]
+                            ],
+                            "line-opacity": 1
+                        },
+                        "filter": [
+                            "in",
+                            "labels",
+                            "roads:levelFourRoad",
+                            "roads:levelThreeRoad",
+                            "roads:secondaryRoad",
+                            "roads:provincialRoad",
+                            "roads:nationalRoad",
+                            "roads:ringRoad",
+                            "roads:highWay"
+                        ]
+                    },
+                    {
+                        "id": "city_normal_line_other",
+                        "type": "line",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "road",
+                        "layout": {
+                            "line-join": "bevel",
+                            "line-cap": "butt"
+                        },
+                        "paint": {
+                            "line-color": "#6a717c",
+                            "line-width": [
+                                "number",
+                                [
+                                    "get",
+                                    "width"
+                                ]
+                            ],
+                            "line-opacity": 1
+                        },
+                        "filter": [
+                            "==",
+                            "labels",
+                            "roads:other"
+                        ]
+                    },
+                    {
+                        "id": "city_normal_line_overPass",
+                        "type": "line",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "road",
+                        "layout": {
+                            "line-join": "bevel",
+                            "line-cap": "butt"
+                        },
+                        "paint": {
+                            "line-color": "#6a717c",
+                            "line-width": 12,
+                            "line-opacity": 1
+                        },
+                        "filter": [
+                            "==",
+                            "labels",
+                            "roads:overPass"
+                        ]
+                    },
+                    {
+                        "id": "city_normal_road_label_id",
+                        "type": "symbol",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "road_label",
+                        "filter": [
+                            "all",
+                            [
+                                "!=",
+                                "labels",
+                                "roads:guideBoards"
+                            ],
+                            [
+                                "!=",
+                                "name",
+                                "↑"
+                            ]
+                        ],
+                        "layout": {
+                            "text-pitch-alignment": "map",
+                            "text-rotation-alignment": "map",
+                            "text-allow-overlap": true,
+                            "text-field": "{name}",
+                            "text-font": [
+                                "Microsoft YaHei"
+                            ],
+                            "text-size": {
+                                "base": 13,
+                                "stops": [
+                                    [
+                                        16,
+                                        13
+                                    ],
+                                    [
+                                        20,
+                                        14
+                                    ]
+                                ]
+                            }
+                        },
+                        "paint": {
+                            "text-color": [
+                                "string",
+                                [
+                                    "get",
+                                    "text_color"
+                                ]
+                            ],
+                            "text-halo-width": 0.1,
+                            "text-halo-color": [
+                                "string",
+                                [
+                                    "get",
+                                    "text_halo_color"
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "city_normal_road_label_img_id",
+                        "type": "symbol",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "road_label",
+                        "filter": [
+                            "==",
+                            "labels",
+                            "roads:guideBoards"
+                        ],
+                        "layout": {
+                            "text-field": "{name}",
+                            "text-font": [
+                                "Microsoft YaHei"
+                            ],
+                            "icon-image": "{icon-image}",
+                            "text-size": 9,
+                            "icon-offset": [
+                                0,
+                                0
+                            ],
+                            "icon-size": 1.1
+                        },
+                        "paint": {
+                            "text-color": [
+                                "string",
+                                [
+                                    "get",
+                                    "text_color"
+                                ]
+                            ],
+                            "text-halo-width": 1,
+                            "text-halo-color": [
+                                "string",
+                                [
+                                    "get",
+                                    "text_halo_color"
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "city_normal_building_id",
+                        "type": "fill-extrusion",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "building",
+                        "layout": {},
+                        "paint": {
+                            "fill-extrusion-color": "#1e2b3e",
+                            "fill-extrusion-opacity": 1,
+                            "fill-extrusion-translate-anchor": "map",
+                            "fill-extrusion-height": [
+                                "number",
+                                [
+                                    "get",
+                                    "fill-extrusion-height"
+                                ]
+                            ],
+                            "fill-extrusion-base": 0,
+                            "fill-extrusion-vertical-gradient": true
+                        },
+                        "minzoom": 12
+                    },
+                    {
+                        "id": "city_normal_poi",
+                        "type": "symbol",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "poi",
+                        "layout": {
+                            "text-field": "{name}",
+                            "text-font": [
+                                "Microsoft YaHei"
+                            ],
+                            "text-size": {
+                                "base": 13,
+                                "stops": [
+                                    [
+                                        16,
+                                        13
+                                    ],
+                                    [
+                                        20,
+                                        14
+                                    ]
+                                ]
+                            },
+                            "icon-image": "{icon-image}",
+                            "text-offset": [
+                                0,
+                                0.6
+                            ],
+                            "text-anchor": "top",
+                            "icon-size": 0.8
+                        },
+                        "paint": {
+                            "text-color": [
+                                "match",
+                                [
+                                    "get",
+                                    "code"
+                                ],
+                                "0",
+                                "#576cbb",
+                                "1",
+                                "#576cbb",
+                                "2",
+                                "#576cbb",
+                                "3",
+                                "#576cbb",
+                                "4",
+                                "#576cbb",
+                                "5",
+                                "#576cbb",
+                                "6",
+                                "#576cbb",
+                                "7",
+                                "#576cbb",
+                                "8",
+                                "#576cbb",
+                                "9",
+                                "#576cbb",
+                                "10",
+                                "#576cbb",
+                                "11",
+                                "#576cbb",
+                                "12",
+                                "#576cbb",
+                                "13",
+                                "#576cbb",
+                                "14",
+                                "#576cbb",
+                                "15",
+                                "#576cbb",
+                                "16",
+                                "#576cbb",
+                                "17",
+                                "#576cbb",
+                                "18",
+                                "#576cbb",
+                                "19",
+                                "#576cbb",
+                                [
+                                    "string",
+                                    [
+                                        "get",
+                                        "text_color"
+                                    ]
+                                ]
+                            ],
+                            "text-halo-width": 1,
+                            "text-halo-color": [
+                                "match",
+                                [
+                                    "get",
+                                    "code"
+                                ],
+                                "0",
+                                "#0c1219",
+                                "1",
+                                "#0c1219",
+                                "2",
+                                "#0c1219",
+                                "3",
+                                "#0c1219",
+                                "4",
+                                "#0c1219",
+                                "5",
+                                "#0c1219",
+                                "6",
+                                "#0c1219",
+                                "7",
+                                "#0c1219",
+                                "8",
+                                "#0c1219",
+                                "9",
+                                "#0c1219",
+                                "10",
+                                "#0c1219",
+                                "11",
+                                "#0c1219",
+                                "12",
+                                "#0c1219",
+                                "13",
+                                "#0c1219",
+                                "14",
+                                "#0c1219",
+                                "15",
+                                "#0c1219",
+                                "16",
+                                "#0c1219",
+                                "17",
+                                "#0c1219",
+                                "18",
+                                "#0c1219",
+                                "19",
+                                "#0c1219",
+                                [
+                                    "string",
+                                    [
+                                        "get",
+                                        "text_halo_color"
+                                    ]
+                                ]
+                            ]
+                        },
+                        "filter": [
+                            "all",
+                            [
+                                "in",
+                                "code",
+                                "0",
+                                "1",
+                                "2",
+                                "3",
+                                "4",
+                                "5",
+                                "6",
+                                "7",
+                                "8",
+                                "9",
+                                "10",
+                                "11",
+                                "12",
+                                "13",
+                                "14",
+                                "15",
+                                "16",
+                                "17",
+                                "18",
+                                "19"
+                            ],
+                            [
+                                "!=",
+                                "icon-image",
+                                "24_360"
+                            ],
+                            [
+                                "!=",
+                                "icon-image",
+                                "72_360"
+                            ]
+                        ]
+                    },
+                    {
+                        "id": "city_normal_subway_kou",
+                        "type": "symbol",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "poi",
+                        "layout": {
+                            "text-field": "{name}",
+                            "text-font": [
+                                "Microsoft YaHei"
+                            ],
+                            "text-size": {
+                                "base": 13,
+                                "stops": [
+                                    [
+                                        16,
+                                        13
+                                    ],
+                                    [
+                                        20,
+                                        14
+                                    ]
+                                ]
+                            },
+                            "icon-image": "{icon-image}",
+                            "text-offset": [
+                                0,
+                                1.5
+                            ],
+                            "text-anchor": "top",
+                            "icon-size": 0.8
+                        },
+                        "paint": {
+                            "text-color": "#576cbb",
+                            "text-halo-width": 1,
+                            "text-halo-color": "#0c1219"
+                        },
+                        "filter": [
+                            "all",
+                            [
+                                "any",
+                                [
+                                    "==",
+                                    "icon-image",
+                                    "24_360"
+                                ],
+                                [
+                                    "==",
+                                    "icon-image",
+                                    "72_360"
+                                ]
+                            ],
+                            [
+                                "==",
+                                "code",
+                                "16"
+                            ]
+                        ]
+                    },
+                    {
+                        "id": "city_normal_district",
+                        "type": "symbol",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "poi",
+                        "layout": {
+                            "text-field": "{name}",
+                            "text-font": [
+                                "Microsoft YaHei"
+                            ],
+                            "icon-offset": [
+                                0,
+                                -17
+                            ]
+                        },
+                        "paint": {
+                            "text-halo-width": 1,
+                            "text-color": [
+                                "match",
+                                [
+                                    "get",
+                                    "labels"
+                                ],
+                                "labels:city",
+                                "#7c837e",
+                                "labels:district",
+                                "#0c1219",
+                                "labels:town",
+                                "#848eae",
+                                "labels:village",
+                                "#717389",
+                                [
+                                    "string",
+                                    [
+                                        "get",
+                                        "text_color"
+                                    ]
+                                ]
+                            ],
+                            "text-halo-color": [
+                                "match",
+                                [
+                                    "get",
+                                    "labels"
+                                ],
+                                "labels:city",
+                                "#0c1219",
+                                "labels:district",
+                                "#7e8fa8",
+                                "labels:town",
+                                "#1e2127",
+                                "labels:village",
+                                "#1e2127",
+                                [
+                                    "string",
+                                    [
+                                        "get",
+                                        "text_halo_color"
+                                    ]
+                                ]
+                            ],
+                            "text-opacity": [
+                                "match",
+                                [
+                                    "get",
+                                    "labels"
+                                ],
+                                "labels:aois",
+                                0,
+                                1
+                            ]
+                        },
+                        "filter": [
+                            "in",
+                            "labels",
+                            "water",
+                            "labels:city",
+                            "labels:district",
+                            "labels:town",
+                            "labels:village",
+                            "labels:aois"
+                        ]
+                    }
+                ]
+            },
+            center: [116.5225882, 39.9392260], // starting position [lng, lat]
+            zoom: 11 // starting zoom
+        });
+    };
+
+    // 默认地图
+    function create_defaultMap(){
+        map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: [116.6011440, 39.9485740],
+            zoom: 15.99,
+            pitch: 40,
+            bearing: 20,
+            antialias: true
+        });
+    };
+
+
+    // 地图默认叠加图层
+    function  add_default_layer(){
+        map.addLayer({
+            'id': 'jxm-line-vector',
+            'type': 'line',
+            'source': 'jxm',
+            'paint': {
+                'line-color': '#393D49',
+                'line-width': 1
+            }
+        });
+
+
+        map.addLayer({
+            'id': 'jxm-polygon-vector',
+            'type': 'fill',
+            'source': 'jxm',
+            'paint': {
+                "fill-color": "#14355d",
+                'fill-opacity':0.5
+            }
+        });
+
+
+        map.addLayer({
+            'id': 'fw0001',
+            'type': 'fill',
+            'source': 'fw',
+            'paint': {
+
+            }
+        });
+
+
+    };
+
+
+    function add_grid_layer(){
+        map.addLayer({
+            'id': 'grid-line-vector',
+            'type': 'line',
+            'source': 'floorplan',
+            'paint': {
+                'line-color': 'white',
+                'line-width': 2
+            },
+            "filter": ['>', 'count', 0]
+        });
+        map.addLayer(
+            {
+                'id': 'room-extrusion',
+                'type': 'fill-extrusion',
+                'source': 'floorplan',
+                'paint': {
+                    'fill-extrusion-opacity': 1,
+                    'fill-extrusion-height': ['get', 'height'],
+                    // 'fill-extrusion-color':"#00ffff",
+                    "fill-extrusion-color": [
+                        "step",
+                        ["get", "count"],
+                        "#2F65B3", 1,
+                        "#37EF37", 5,
+                        "#0ff", 10,
+                        "#37EF37", 15,
+                        "#EBEB3C", 20,
+                        "#E43838", 25,
+                        "#FF433D" // other
+                    ]
+                },
+                "filter": ['>', 'count', 0]
+            }
+        );
+        // 文本标注
+        // map.addLayer(
+        //     {
+        //         'id': 'points',
+        //         'type': 'symbol',
+        //         'source': 'floorplan',
+        //         'layout': {
+        //             'text-field': ['get', 'count'],
+        //             "text-size": 12
+        //         },
+        //         paint: {
+        //             'text-color': '#000000'
+        //         },
+        //         "filter": ['>', 'count', 0]
+        //     }
+        // );
+
+    };
+
+
+    create_grayMap();
+
+    map.on('load', function () {
+        map.addSource('floorplan', {
+        // GeoJSON Data source used in vector tiles, documented at
+        // https://gist.github.com/ryanbaumann/a7d970386ce59d11c16278b90dde094d
+            'type': 'geojson',
+            'data':
+                '${base!}/examples/testdata/test002.geojson'
+        });
+
+        map.addSource('jxm', {
+            'type': 'geojson',
+            'data':
+                '${base!}/examples/testdata/jxm_thematic2.geojson'
+        });
+
+        map.addSource('fw', {
+            'type': 'geojson',
+            'data':
+                '${base!}/examples/testdata/fw_difference.geojson'
+        });
+
+        add_default_layer();
+
+        add_grid_layer();
+
+
+
+
+
+
+
+
+
+
+
+    });
+</script>
+
+</body>
+</html>
