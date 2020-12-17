@@ -1,0 +1,24 @@
+#道路 （10） minzoom": 10
+roads:highSpeedRailway=高铁 （14）
+roads:highWay=高速公路10
+roads:ringRoad=环路11
+roads:nationalRoad=国道 12
+roads:provincialRoad=省道 13
+roads:secondaryRoad=二级公路
+roads:levelThreeRoad=三级公路
+roads:levelFourRoad=四级公路
+roads:overPass=天桥
+roads:guideBoards=路牌
+
+
+
+#区域面
+regions:green=绿地
+water=水系
+
+#兴趣点
+3：风景名胜
+6：科教文化
+11：商务住宅
+12：政府机构及社会团体
+18：地名

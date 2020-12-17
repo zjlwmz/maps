@@ -13,8 +13,8 @@ roads:guideBoards=路牌
 
 
 #区域面
-regions:green=绿地
-water=水系
+regions:green=绿地｜地图里的绿地元素，如公园（北海公园）、校园里的操场等。
+water=水系｜地图里水系的设置样式，水系包括海洋、河流（如长江、黄河）、公园里的水系（如北海公园）等。
 regions:edu=教育
 regions:public=公共设施
 regions:traffic=交通
@@ -32,6 +32,7 @@ labels:town=乡镇
 labels:village=村庄
 labels:aois=兴趣区
 
+#兴趣点
 0：住宿
 1：餐饮
 2：购物
@@ -60,3 +61,148 @@ labels:aois=兴趣区
 building=建筑
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+region:[{
+    categoryId : "green",
+    name : "绿地",
+    level : 2,
+    desc : "地图里的绿地元素，如公园（北海公园）、校园里的操场等。",
+}, {
+    categoryId : "water",
+    name : "水系",
+    level : 2,
+    desc : "地图里水系的设置样式，水系包括海洋、河流（如长江、黄河）、公园里的水系（如北海公园）等。",
+}, {
+    categoryId : "subway",
+    name : "地铁设施",
+    level : 3,
+
+    desc : "地铁设施，可设置是否显示。"
+}, {
+    categoryId : "edu",
+    name : "教育区域",
+    level : 3,
+
+    desc : "教育区域，可设置是否显示。"
+}, {
+    categoryId : "health",
+    name : "医疗区域",
+    level : 3,
+
+    desc : "医疗区域，可设置是否显示。"
+}, {
+    categoryId : "scenicSpot",
+    name : "景点区域",
+    level : 3,
+
+    desc : "景点区域，可设置是否显示。"
+}, {
+    categoryId : "public",
+    name : "公共设施",
+    level : 2,
+
+    desc : "公共设施，可设置是否显示。"
+}, {
+    categoryId : "traffic",
+    name : "交通枢纽",
+    level : 2,
+
+    desc : "交通枢纽，可设置是否显示。"
+},{
+    categoryId : "sports",
+    name : "运动场所",
+    level : 2,
+
+    desc : "运动场所，可设置是否显示。"
+}, {
+    categoryId : "business",
+    name : "商业场所",
+    level : 2,
+
+    desc : "商业场所，可设置是否显示。"
+}, {
+    categoryId : "parkingLot",
+    name : "停车场",
+    level : 2,
+
+    desc : "停车场，可设置是否显示。"
+} ];
+
+
+
+
+road:[ {
+    categoryId : "highway",
+    name : "高速",
+    desc : "地图里的高速公路，可设置是否显示。"
+}, {
+    categoryId : "ringRoad",
+    name : "城市环线",
+    desc : "地图里的城市环线，可设置是否显示。"
+}, {
+    categoryId : "nationalRoad",
+    name : "国道",
+    desc : "地图里的国道，可设置是否显示。"
+}, {
+    categoryId : "provincialRoad",
+    name : "省道",
+    desc : "地图里的省道，可设置是否显示。"
+}, {
+    categoryId : "secondaryRoad",
+    name : "二级公路",
+    desc : "地图里的二级公路，可设置是否显示。"
+}, {
+    categoryId : "levelThreeRoad",
+    name : "三级公路",
+    desc : "地图里的三级公路，可设置是否显示。"
+}, {
+    categoryId : "levelFourRoad",
+    name : "四级公路",
+    desc : "地图里的四级公路，可设置是否显示。"
+}, {
+    categoryId : "railway",
+    name : "铁路",
+    desc : "地图里的火车线路，可设置是否显示。"
+}, {
+    categoryId : "highSpeedRailway",
+    name : "高速铁路",
+    desc : "地图里的高速铁路，可设置是否显示。"
+}, {
+    categoryId : "subway",
+    name : "地铁",
+    desc : "地图里的地铁线路，可设置是否显示。"
+}, {
+    categoryId : "overPass",
+    name : "天桥",
+    desc : "地图里的天桥，可设置是否显示。"
+}, {
+    categoryId : "underPass",
+    name : "地下通道",
+    desc : "地图里的地下通道，可设置是否显示。"
+}, {
+    categoryId : "other",
+    name : "其它路线",
+    desc : "地图里的其它路线，可设置是否显示。"
+}, {
+    categoryId : "roadsBeingBuilt",
+    name : "在建道路",
+    desc : "地图里的在建道路，可设置是否显示。"
+}, {
+    categoryId : "subwayBeingBuilt_fill",
+    name : "在建地铁",
+    desc : "地图里的在建地铁，可设置是否显示。"
+}
