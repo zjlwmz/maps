@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>3d 格网</title>
+    <title>文旅云-默认展示地图</title>
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
@@ -13,10 +13,9 @@
 </head>
 <body>
 <div id="map"></div>
+
 <script>
-
     mapboxgl.accessToken = 'pk.eyJ1IjoiemhhbmdqaWFsdSIsImEiOiJjajRvOW44eDcwOGtqMzNxNnFvemQ2ZTlyIn0.i01rCdfpdvooSqkHQBxPBA';
-
 
     var map;
     //蓝黑地图
@@ -858,25 +857,9 @@
             maxZoom:18,
             zoom: 11 // starting zoom
         });
-
-        map.setPitch(45.5);//视角
-        map.setBearing(0);//轴承|旋转
-
     };
 
-    // 默认地图
-    function create_defaultMap(){
-        map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/streets-v11',
-            center: [116.6011440, 39.9485740],
-            zoom: 15.99,
-            pitch: 40,
-            bearing: 20,
-            antialias: true
-        });
-    };
-
+    create_grayMap();
 
     // 地图默认叠加图层
     function  add_default_layer(){
@@ -914,79 +897,7 @@
 
     };
 
-
-    function add_grid_layer(){
-        map.addLayer({
-            'id': 'grid-line-vector',
-            'type': 'line',
-            'source': 'floorplan',
-            'paint': {
-                'line-color': 'white',
-                'line-width': 2
-            },
-            "filter": ['>', 'count', 0]
-        });
-        map.addLayer(
-            {
-                'id': 'room-extrusion',
-                'type': 'fill-extrusion',
-                'source': 'floorplan',
-                'paint': {
-                    'fill-extrusion-opacity': 1,
-                    'fill-extrusion-height': ['get', 'height'],
-                    // 'fill-extrusion-color':"#00ffff",
-                    // "fill-extrusion-color": [
-                    //     "step",
-                    //     ["get", "count"],
-                    //     "#2F65B3", 1,
-                    //     "#37EF37", 5,
-                    //     "#0ff", 10,
-                    //     "#37EF37", 15,
-                    //     "#EBEB3C", 20,
-                    //     "#E43838", 25,
-                    //     "#FF433D" // other
-                    // ]
-                    "fill-extrusion-color": [
-                        "step",
-                        ["get", "count"],
-                        "#008c6f", 1,
-                        "#e01074", 15,
-                        "#FF433D" // other
-                    ]
-                },
-                "filter": ['>', 'count', 0]
-            }
-        );
-        // 文本标注
-        // map.addLayer(
-        //     {
-        //         'id': 'points',
-        //         'type': 'symbol',
-        //         'source': 'floorplan',
-        //         'layout': {
-        //             'text-field': ['get', 'count'],
-        //             "text-size": 12
-        //         },
-        //         paint: {
-        //             'text-color': '#000000'
-        //         },
-        //         "filter": ['>', 'count', 0]
-        //     }
-        // );
-
-    };
-
-
-    create_grayMap();
-
     map.on('load', function () {
-        map.addSource('floorplan', {
-        // GeoJSON Data source used in vector tiles, documented at
-        // https://gist.github.com/ryanbaumann/a7d970386ce59d11c16278b90dde094d
-            'type': 'geojson',
-            'data':
-                '${base!}/examples/testdata/test003.geojson'
-        });
 
         map.addSource('jxm', {
             'type': 'geojson',
@@ -1001,16 +912,6 @@
         });
 
         add_default_layer();
-
-        add_grid_layer();
-
-
-
-
-
-
-
-
 
 
 
