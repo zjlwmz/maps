@@ -1,5 +1,17 @@
 
 # 示例访问地址
+http://localhost:8080/maps/example/index?name=public/examples/mapbox-local
+http://localhost:8080/maps/example/index?name=public/examples/mapbox-local3
+http://localhost:8080/maps/example/index?name=public/examples/mapbox-local4
+
+
+http://localhost:8080/maps/example/index?name=public/examples/wldb/mapbox-wldb-local
+
+
+http://localhost:8080/maps/example/index?name=public/examples/mapbox-local_special
+
+
+
 http://localhost:8080/maps/example/index?name=public/examples/mapbox-local4_custom_style
 
 
@@ -42,3 +54,42 @@ http://localhost:8080/maps/example/index?name=public/examples/isochrones/mapx-is
 //         'fill-opacity':0.2
 //     }
 // });
+
+/Users/zhangjialu/IdeaProjects/maps/WebRoot/WEB-INF/views/public/examples/mapbox-polygon.html
+
+
+3d面
+http://localhost:8080/maps/example/index?name=public/examples/mapbox-polygon-jxm
+
+
+
+
+#二维热力图
+http://localhost:8080/maps/example/index?name=public/examples/mapbox-heatmap
+http://localhost:8080/maps/example/index?name=public/examples/heatmap/mapbox-heatmap
+
+
+
+#3d热力图
+http://localhost:8080/maps/example/index?name=public/examples/mapbox-3dheatmap
+
+
+
+
+#地图格网-图层
+http://localhost:8080/maps/example/index?name=public/examples/grid/mapbox-polygon-grid01
+
+
+
+#truf生成格网
+http://localhost:8080/maps/example/index?name=public/examples/turf/mapbx-turf001
+http://localhost:8080/maps/example/index?name=public/examples/turf/mapbx-turf002
+
+
+# 3d格网
+http://localhost:8080/maps/example/index?name=public/examples/grid/mapbox-polygon-grid03
+
+
+
+#兴趣点图层调整
+http://localhost:8080/maps/example/index?name=public/examples/gaode/index
