@@ -89,7 +89,18 @@ public class HomeController {
 	public Object map(){
 		return null;
 	}
-	
+
+
+	/**
+	 * 地图-百度
+	 * @return
+	 */
+	@At(value="baidu")
+	@Ok("beetl:/public/baidu.html")
+	public Object baidu(){
+		return null;
+	}
+
 	
 	/**
 	 * postgis操作
