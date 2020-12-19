@@ -136,20 +136,19 @@ function initMap(){
             searchMarkerLayer.addLayer(marker);
             var html=[];
 
-            //火星坐标
-            var gcjLonlat=latlng.lat.toFixed(7)+","+latlng.lng.toFixed(7);
+            //GCJ-02 坐标系
+            var gcjLonlat = GPS.bd_decrypt(latlng.lat, latlng.lng);
+
             //wgs84坐标
-            var wgs84Lonlat = GPS.gcj_encrypt(latlng.lat, latlng.lng);
-            //BD-09 百度坐标
-            var bd09Lonlat = GPS.bd_encrypt(latlng.lat, latlng.lng);
+            var wgs84Lonlat = GPS.gcj_decrypt(gcjLonlat.lat, gcjLonlat.lon);
+
 
             var loadingUrl = baseUrl+"/static/images/icon/loading.gif";
             html.push("<div class='popup'>");
-            html.push("<div class='point gcj'>谷歌地图："+gcjLonlat+"</div>");
-            html.push("<div class='point'>百度地图："+bd09Lonlat.lat.toFixed(7)+","+bd09Lonlat.lon.toFixed(7)+"</div>");
-            html.push("<div class='point'>腾讯高德："+gcjLonlat+"</div>");
+            html.push("<div class='point gcj'>谷歌地图："+gcjLonlat.lat.toFixed(7)+","+gcjLonlat.lon.toFixed(7)+"</div>");
+            html.push("<div class='point'>百度地图："+latlng.lat.toFixed(7)+","+latlng.lng.toFixed(7)+"</div>");
             html.push("<div class='point wg84'>谷歌地球："+wgs84Lonlat.lat.toFixed(7)+","+wgs84Lonlat.lon.toFixed(7)+"</div>");
-            html.push("<div>地址：<span class='popup-address' data-x='"+latlng.lng+"' data-y='"+latlng.lat+"'><img src='"+loadingUrl+"' /></span></div>");
+            html.push("<div>地址：<span class='popup-address' data-x='"+gcjLonlat.lon+"' data-y='"+gcjLonlat.lat+"'><img src='"+loadingUrl+"' /></span></div>");
             html.push("<div>");
             var htmlStr=html.join("");
             marker.bindPopup(htmlStr).openPopup();
@@ -216,6 +215,7 @@ function initMap(){
 };
 
 /**
+ * 自定义样式地图，customid可选值：dark,midnight,grayscale,hardedge,light,redalert,googlelite,grassgreen,pink,darkgreen,bluish
  * 添加百度地图
  */
 function addBaiduBaseLayer(){
@@ -226,7 +226,7 @@ function addBaiduBaseLayer(){
         "百度地图-大字体": L.tileLayer.baidu({ layer: 'vec', bigfont: true }),
         "百度卫星-大字体": L.tileLayer.baidu({ layer: 'img', bigfont: true }),
         "自定义样式-黑色地图": L.tileLayer.baidu({ layer: 'custom', customid: 'dark' }),
-        "自定义样式-蓝色地图": L.tileLayer.baidu({ layer: 'custom', customid: 'midnight' }) //自定义样式地图，customid可选值：dark,midnight,grayscale,hardedge,light,redalert,googlelite,grassgreen,pink,darkgreen,bluish
+        "自定义样式-蓝色地图": L.tileLayer.baidu({ layer: 'custom', customid: 'midnight' })
     }, {
         "实时交通信息": L.tileLayer.baidu({ layer: 'time' })
     }, { position: "topright" }).addTo(map);
@@ -528,8 +528,6 @@ function findinputtips(keywords) {
  */
 function findArredssByLocation(xy) {
     locationLayer.clearLayers();//清空
-    //http://api.map.baidu.com/geocoding/v3/?address=北京市海淀区上地十街10号&output=json&ak=您的ak&callback=showLocation
-    //http://api.map.baidu.com/reverse_geocoding/v3/?ak=您的ak&output=json&coordtype=wgs84ll&location=31.225696563611,121.49884033194
     $.ajax({
         url : "http://api.map.baidu.com/reverse_geocoding/v3/",
         dataType: 'jsonp',

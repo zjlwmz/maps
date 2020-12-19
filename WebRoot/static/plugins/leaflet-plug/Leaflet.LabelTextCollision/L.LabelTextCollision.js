@@ -242,5 +242,5 @@ L.LabelTextCollision = L.Canvas
                     var containerPoint = this._map.latLngToContainerPoint(latlngCenter);
                     return this._map.containerPointToLayerPoint(containerPoint);
                 }
-            },
+            }
         });

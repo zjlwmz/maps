@@ -139,7 +139,6 @@ function initMap(){
         	html.push("<div class='popup'>");
 	        	html.push("<div class='point gcj'>百度坐标："+baiduLonlat+"</div>");
 	        	html.push("<div class='point'>百度地图："+bd09Lonlat.lat.toFixed(7)+","+bd09Lonlat.lon.toFixed(7)+"</div>");
-	        	html.push("<div class='point'>腾讯高德："+gcjLonlat+"</div>");
 	        	html.push("<div class='point wg84'>谷歌地球："+wgs84Lonlat.lat.toFixed(7)+","+wgs84Lonlat.lon.toFixed(7)+"</div>");
 	        	html.push("<div>地址：<span class='popup-address' data-x='"+latlng.lng+"' data-y='"+latlng.lat+"'><img src='"+loadingUrl+"' /></span></div>");
         	html.push("<div>");
@@ -702,7 +701,6 @@ function findArredssByLocation(xy) {
 					
 						html.push("<div class='point gcj'>谷歌地图："+gcjLonlat+"</div>");
 						html.push("<div class='point'>百度地图："+bd09Lonlat.lat.toFixed(7)+","+bd09Lonlat.lon.toFixed(7)+"</div>");
-						html.push("<div class='point'>腾讯高德："+gcjLonlat+"</div>");
 						html.push("<div class='point wg84'>谷歌地球："+parseFloat(wgs84Lonlat.lat).toFixed(7)+","+parseFloat(wgs84Lonlat.lon).toFixed(7)+"</div>");
 						
 						html.push("<div class='point'>所在位置："+formatted_address+"</div>");
@@ -790,7 +788,6 @@ function findLocationXY(keyword) {
 					
 						html.push("<div class='point gcj'>谷歌地图："+gcjLonlat+"</div>");
 						html.push("<div class='point'>百度地图："+bd09Lonlat.lat.toFixed(7)+","+bd09Lonlat.lon.toFixed(7)+"</div>");
-						html.push("<div class='point'>腾讯高德："+gcjLonlat+"</div>");
 						html.push("<div class='point wg84'>谷歌地球："+parseFloat(wgs84Lonlat.lat).toFixed(7)+","+parseFloat(wgs84Lonlat.lon).toFixed(7)+"</div>");
 						
 						html.push("<div class='point'>靠近位置："+ geocode.formatted_address + "</div>");

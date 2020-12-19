@@ -1,0 +1,127 @@
+<!--
+ * @Author: dinglei
+ * @Date: 2019-12-25 16:18:10
+ * @LastEditors  : Please set LastEditors
+ * @LastEditTime : 2020-01-15 10:31:13
+ * @Description: 飞线例子
+ -->
+ <!DOCTYPE html>
+ <html>
+ 
+ <head>
+     <title>Mapbox GL JS debug page</title>
+     <meta charset='utf-8'>
+     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+     <!-- <link href="../../dist/lib/boss-3dmap.css" rel='stylesheet' /> -->
+     <style>
+         body {
+             margin: 0;
+             padding: 0;
+         }
+ 
+         html,
+         body,
+         #map {
+             height: 100%;
+             width: 100%;
+             position: absolute;
+         }
+         .heatmap{
+            width: 256px;height: 256px;
+             position: absolute;
+         }
+         #changeHeatmap{
+             position: absolute;
+             top: 48px;
+             right: 48px;
+             width: 64px;
+             height: 64px;
+             background: #fff;
+             border-radius: 8px;
+             text-align: center;
+             line-height: 64px;
+             z-index: 10;
+         }
+     </style>
+ </head>
+ 
+ <body>
+     <div class="heatmap"></div>
+     <div id='map'></div>
+     <div id="changeHeatmap">点击变化热力图</div>
+
+    
+     <script src='https://cdn.bootcdn.net/ajax/libs/mapbox-gl/2.0.0/mapbox-gl.js'></script>
+     <script src="https://cdn.bootcdn.net/ajax/libs/three.js/r122/three.js"></script>
+     <!-- <script src="https://unpkg.com/three@0.102.0/examples/js/loaders/GLTFLoader.js"></script> -->
+     <!-- <script src="../../dist/boss-3dmap.js"></script> -->
+     <script src="./Framebuffer.js"></script>
+
+     
+     <script src="./Texture.js"></script>
+     <script src="./Node.js"></script>
+     <script src="./Shader.js"></script>
+     <script src="./share.js"></script>
+     <script src="./HeatmapGL$1.js"></script>
+     <!-- <script src="./HeatmapGL.js"></script> -->
+     <script src="./heatmap.js"></script>
+     
+     <!-- <script src="./index.js"></script> -->
+     <script src="./newIndex.js"></script>
+
+     <!-- <script>
+         document.oncontextmenu = () => {
+             return false
+         }
+         let map = new bossmap.Map({
+             container: 'map',
+             style: '../assets/style/day.json',
+             zoom: 6.6,
+             longitude: -1.4157267858730052,
+             latitude: 52.232395363869415,
+             maxPitch: 85,
+             antialias: true,
+             skybox: [ "../assets/images/TropicalSunnyDay_px.jpg", "../assets/images/TropicalSunnyDay_nx.jpg",
+                     "../assets/images/TropicalSunnyDay_py.jpg", "../assets/images/TropicalSunnyDay_ny.jpg",
+                     "../assets/images/TropicalSunnyDay_pz.jpg", "../assets/images/TropicalSunnyDay_nz.jpg" ]
+         })
+         const data = [
+             
+         ]
+         const colorRange = [
+             [1, 152, 189],
+             [73, 227, 206],
+             [216, 254, 181],
+             [254, 237, 177],
+             [254, 173, 84],
+             [209, 55, 78]
+         ];
+         const material = {
+             ambient: 0.64,
+             diffuse: 0.6,
+             shininess: 32,
+             specularColor: [51, 51, 51]
+         };
+         let layer = map.addLayer('hexagon', {
+             id: '3dheatmap',
+             data: './heatmap-data.json',
+             colorRange,
+             coverage: 1,
+             elevationRange: [0, 3000],
+             elevationScale: 50,
+             extruded: true,
+             getPosition: d => d,
+             pickable: true,
+             radius: 1000,
+             upperPercentile: 100,
+             material,
+             transitions: {
+                 elevationScale: 3000
+             }
+         })
+          
+      </script> -->
+  </body>
+  
+  </html>
+ 
