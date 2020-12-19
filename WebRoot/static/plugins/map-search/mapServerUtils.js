@@ -1,5 +1,5 @@
 /**
- * 地图服务查询
+ * 高德地图服务查询
  */
 var MapServerUtils={
 	utils:{
@@ -424,9 +424,13 @@ var MapServerUtils={
 				}
 			}
 		}
+	},
+	baidu:{
+		findinputtips:function(){
+			alert();
+		}
 	}
 	
 		
 	
 };
-
