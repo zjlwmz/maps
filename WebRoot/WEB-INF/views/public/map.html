@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="${base!}/static/css/common.css?t=1.01" type="text/css"/>
 <link rel="stylesheet" href="${base!}/static/plugins/leaflet/leaflet.css" type="text/css"/>
 <link rel="stylesheet" href="${base!}/static/plugins/leaflet-plug/Leaflet.MousePosition-master/src/L.Control.MousePosition.css" type="text/css"/>
-<link rel="stylesheet" href="${base!}/static/css/maps.css?t=1.57" type="text/css"/>
+<link rel="stylesheet" href="${base!}/static/css/maps.css?t=1.58" type="text/css"/>
 
 <script type="text/javascript" src="${base!}/static/plugins/utils/GPS.js"></script>
 <script type="text/javascript" src="${base!}/static/plugins/layui-v2.4.3/layui/layui.js"></script>
@@ -21,11 +21,15 @@
 
 <script type="text/javascript" src="${base!}/static/plugins/leaflet-plug/Leaflet.MousePosition-master/src/L.Control.MousePosition.js"></script>
 
+<link rel="stylesheet" href="${base!}/static/plugins/cityselect/cityselect.css?t=1.002">
+<script src="${base!}/static/plugins/cityselect/cityselect.js"></script>
+
 <script type="text/javascript" src="${base!}/static/plugins/map-search/config.js"></script>
 <script type="text/javascript" src="${base!}/static/plugins/map-search/mapServerUtils.js?t=1.23"></script>
 <script type="text/javascript" src="${base!}/static/plugins/map-search/maps.js?t=1.113"></script>
 <script type="text/javascript">var baseUrl="${base!}";</script>
 
+<script src="${base!}/static/plugins/china.city/city.code.js"></script>
 
 
 </head>
@@ -68,12 +72,13 @@
 			
 		</div>
 	</div>
-	
-	<div id="id_weather">
-		<div class="navigation-div">
-			<text id="weather_color" class="weather"></text>
-			 <br> 
-			<text id="weather_color" class="temperature"></text>
+
+	<div id="select-city">
+		<input type="text" class="cityinput" id="citySelect" placeholder="请输入目的地" value="北京市" style="min-width: 60px;" />
+		<div class="weather-box">
+			<div class="weather-item weather-info">
+				<text id="weather_color" class="weather"></text></br><text id="weather_color" class="temperature"></text>
+			</div>
 		</div>
 	</div>
 
