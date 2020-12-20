@@ -70,6 +70,27 @@ function initDom(){
 		directionSearch();
 	});
 
+
+
+
+	var citySelectInput=new Vcity.CitySelector({input:'citySelect'});
+	$("#citySelect").change(function(){
+		console.log($(this).val());
+		var selectCity = $(this).val();
+		var code = null;
+		if(selectCity){
+			for(var i=0;i<cityCode.length;i++){
+				if(cityCode[i].name ==selectCity){
+					code = cityCode[i].adcode;
+					break;
+				}
+			}
+			if(code){
+				findWeatherInfo(code);
+			}
+		}
+	});
+
 };
 
 
@@ -602,13 +623,17 @@ function directionSearch(){
 /**
  * 天气查询
  */
-function findWeatherInfo(){
+function findWeatherInfo(city){
+	//$(".weather-item.weather-info").empty();
+	if(null == city){
+		city = "110000";
+	}
 	// 调用天气接口,暂时查询北京的天气
 	$.ajax({
 		 url:"https://restapi.amap.com/v3/weather/weatherInfo",
 		 dataType : "json",
 		 data:{
-			 city:"110000",
+			 city:city,
 			 key : "853ca443b4e7edc49849b8e36da1e70b",
 		     output : "json"
 		 },

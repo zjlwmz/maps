@@ -192,21 +192,8 @@ html, body {
 	height: 24px !important;
 }
 
-#id_weather {
-	top: 10px;
-	left: 71%;
-	border-radius: 4px;
-	padding: 5px;
-	overflow: hidden;
-	background: #fff;
-	text-align: left;
-	border: 1px solid #ccc;
-	z-index: 99999;
-	position: absolute;
-}
-
 #weather_color{
-	font-size: 15px;
+	font-size: 12px;
 	color: #777676;
 	text-align: center;
 	position: relative;
@@ -321,4 +308,19 @@ html, body {
     margin-bottom: 5px;
     font-size: 12px;
     top: -1px;
+}
+
+#select-city{
+	position: absolute;
+	left: 513px;
+	top: 24px;
+	background-color: white;
+	min-width: 100px;
+	height: 39px;
+	z-index: 20000;
+	border-radius: 2px;
+}
+.weather-box{
+	float: right;
+	min-width: 30px;
 }
