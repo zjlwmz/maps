@@ -1,0 +1,8 @@
+
+#paint-property 样式配置
+https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#paint-property
+
+
+
+#mapbox-local
+加载本地样式，配置面样式熟悉的时候，出现style找不到，需要本地样式配置的一个说明文档
