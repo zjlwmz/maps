@@ -93,3 +93,4 @@ http://localhost:8080/maps/example/index?name=public/examples/grid/mapbox-polygo
 
 #兴趣点图层调整
 http://localhost:8080/maps/example/index?name=public/examples/gaode/index
+http://localhost:8080/maps/example/index?name=public/examples/gaode/index01
