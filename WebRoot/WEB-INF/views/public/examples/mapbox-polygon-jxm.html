@@ -54,6 +54,34 @@
                 'fill-extrusion-opacity': 0.9
             }
         });
+
+
+
+
+        map.addLayer({
+            'id': 'room-extrusion_label',
+            'type': 'symbol',
+            'source': 'floorplan',
+            "layout": {
+                "text-field": "{标准名}",
+                "text-font": [
+                    "Microsoft YaHei"
+                ],
+                "text-size": {
+                    "base": 13,
+                    "stops": [
+                        [
+                            16,
+                            13
+                        ],
+                        [
+                            20,
+                            14
+                        ]
+                    ]
+                },
+            }
+        });
     });
 </script>
 
