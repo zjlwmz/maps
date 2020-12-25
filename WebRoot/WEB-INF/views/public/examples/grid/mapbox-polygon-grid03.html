@@ -912,6 +912,23 @@
         });
 
 
+
+        map.addLayer({
+            'id': 'cyqJx_001',
+            'type': 'line',
+            'source': 'cyqJx',
+            'paint': {
+                'line-width':1,
+                // 'line-color':'#22f3fa',
+                'line-color':'rgba(34,243,250,0.5)',
+                // "line-dasharray": [2, 4]
+            }
+        });
+
+
+
+
+
     };
 
 
@@ -921,7 +938,7 @@
             'type': 'line',
             'source': 'floorplan',
             'paint': {
-                'line-color': 'white',
+                'line-color': 'red',
                 'line-width': 2
             },
             "filter": ['>', 'count', 0]
@@ -1000,11 +1017,24 @@
                 '${base!}/examples/testdata/fw_difference.geojson'
         });
 
+
+        map.addSource('cyqJx', {
+            'type': 'geojson',
+            'data':
+                'http://39.106.68.85:8080/cy/static/data/cyqJx.json'
+        });
+
+
+
+
+
+
+
         add_default_layer();
 
+
+
         add_grid_layer();
-
-
 
 
 

@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>文旅云-默认展示地图</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+
+    <script src="${base!}/static/plugins/jquery/jquery-1.8.2.min.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        #zoom-show{
+            position: absolute;
+            left: 6px;
+            bottom: 0px;
+            min-width: 36px;
+            height: 30px;
+            z-index: 1000;
+            background: white;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 5px;
+            padding: 0 10px;
+        }
+    </style>
+
+</head>
+<body>
+<div id="map"></div>
+<div id="zoom-show">11</div>
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiemhhbmdqaWFsdSIsImEiOiJjajRvOW44eDcwOGtqMzNxNnFvemQ2ZTlyIn0.i01rCdfpdvooSqkHQBxPBA';
+
+    var map;
+    //蓝黑地图
+    function create_grayMap(){
+        map = new mapboxgl.Map({
+            container: 'map', // container id
+            style:{
+                "version": 8,
+                "sprite": "http://39.106.68.85:8080/mapbox/cyq/sprite/sprite/",
+                "glyphs": "http://39.106.68.85:8080/mapbox/cyq/glyphs/{fontstack}/{range}.pbf",
+                "sources": {
+                    "438af1ba-dbe4-4838-8553-8f84e50859e0": {
+                        "type": "vector",
+                        "tiles": ["http://39.106.68.85:8080/mapbox/cyq/tiles/{z}/{x}/{y}.pbf"]
+                    }
+                },
+                "layers": [{
+                    "id": "background",
+                    "interactive": true,
+                    "paint": {
+                        "background-color": "#04153B"
+                    },
+                    "type": "background",
+                    "source": "438af1ba-dbe4-4838-8553-8f84e50859e0"
+                },
+                 //水系
+                 {
+                        "id": "city_normal_region_water",
+                        "type": "fill",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "region",
+                        "layout": {},
+                        "paint": {
+                            "fill-color": ["match", ["get", "labels"],
+                                "water", "#44A9DB",
+                                ["string", ["get", "style"]]],
+                            "fill-opacity": 1,
+                            "fill-antialias": true
+                        },
+                        "filter": ["in", "labels",  "water"],
+                        "minzoom":10
+                    },
+                    //绿地
+                    {
+                    "id": "city_normal_region_green",
+                    "type": "fill",
+                    "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                    "source-layer": "region",
+                    "layout": {},
+                    "paint": {
+                        "fill-color": ["match", ["get", "labels"],
+                            "regions:green", "#034716",
+                            ["string", ["get", "style"]]],
+                        "fill-opacity": 1,
+                        "fill-antialias": true
+                    },
+                    "filter": ["in", "labels", "regions:green"],
+                    "minzoom":10
+                },
+                    /* {
+                     "id": "city_normal_line",
+                     "type": "line",
+                     "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                     "source-layer": "road",
+                     "layout": {
+                         "line-join": "bevel",
+                         "line-cap": "butt"
+                     },
+                     "paint": {
+                         "line-color": ["string", ["get", "fillStyle"]],
+                         "line-width": ["number", ["get", "width"]],
+                         "line-opacity": 1
+                     },
+                     "filter": ["in", "labels", "borders:foreign", "borders:China", "borders:provincial"]
+                 }, */
+                    //地铁设施
+                    /*{
+                     "id": "city_normal_region_subway",
+                     "type": "fill",
+                     "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                     "source-layer": "region",
+                     "layout": {},
+                     "paint": {
+                         "fill-color": "#8099b4",
+                         "fill-outline-color": "#8099b4",
+                         "fill-opacity": 1,
+                         "fill-antialias": true
+                     },
+                     "filter": ["==", "labels", "regions:subway"]
+                 }, */
+                    //地下通道
+                    {
+                     "id": "city_normal_line_underPass",
+                     "type": "line",
+                     "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                     "source-layer": "road",
+                     "layout": {
+                         "line-join": "bevel",
+                         "line-cap": "butt"
+                     },
+                     "paint": {
+                         "line-color": "#889097",
+                         "line-width": ["number", ["get", "width"]],
+                         "line-opacity": 1
+                     },
+                     "filter": ["==", "labels", "roads:underPass"]
+                 },
+                    //铁路 -start
+                    {
+                     "id": "city_normal_line_railway_stroke",
+                     "type": "line",
+                     "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                     "source-layer": "road",
+                     "layout": {
+                         "line-join": "bevel",
+                         "line-cap": "butt"
+                     },
+                     "paint": {
+                         "line-color": "#064172",
+                         "line-width": 3,
+                         "line-opacity": 1
+                     },
+                     "filter": ["==", "labels", "roads:railway"],
+                     "minzoom": 13
+                 }, {
+                     "id": "city_normal_line_railway_fill",
+                     "type": "line",
+                     "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                     "source-layer": "road",
+                     "layout": {
+                         "line-join": "bevel",
+                         "line-cap": "butt"
+                     },
+                     "paint": {
+                         "line-color": "#2D313A",
+                         "line-width": 2,
+                         "line-opacity": 1,
+                         "line-dasharray": [6, 6]
+                     },
+                     "filter": ["==", "labels", "roads:railway"],
+                     "minzoom": 13
+                 }, //铁路 -end
+
+                    //高铁 -start
+                    {
+                     "id": "city_normal_line_highSpeedRailway_stroke",
+                     "type": "line",
+                     "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                     "source-layer": "road",
+                     "layout": {
+                         "line-join": "bevel",
+                         "line-cap": "butt"
+                     },
+                     "paint": {
+                         "line-color": "#0099FF",
+                         "line-width": 3,
+                         "line-opacity": 1
+                     },
+                     "filter": ["==", "labels", "roads:highSpeedRailway"],
+                     "minzoom": 13
+                 }, {
+                     "id": "city_normal_line_highSpeedRailway_fill",
+                     "type": "line",
+                     "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                     "source-layer": "road",
+                     "layout": {
+                         "line-join": "bevel",
+                         "line-cap": "butt"
+                     },
+                     "paint": {
+                         "line-color": "#2D313A",
+                         "line-width": 2,
+                         "line-opacity": 1,
+                         "line-dasharray": [6, 6]
+                     },
+                     "filter": ["==", "labels", "roads:highSpeedRailway"],
+                     "minzoom": 13
+                 },//高铁 -end
+                 //国道-start
+                 {
+                     "id": "city_normal_line_road_nationalRoad",
+                     "type": "line",
+                     "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                     "source-layer": "road",
+                     "layout": {
+                         "line-join": "bevel",
+                         "line-cap": "butt"
+                     },
+                     "paint": {
+                         "line-width": [
+                             "number",
+                             [
+                                 "get",
+                                 "width"
+                             ]
+                         ],
+                         "line-color":"#769EDF",
+                         "line-opacity": 1
+                     },
+                     "filter": ["in", "labels","roads:nationalRoad"],
+                     "minzoom":12
+                 },
+                    {
+                        "id": "city_normal_road_nationalRoad_label_id",
+                        "type": "symbol",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "road_label",
+                        "filter": ["in", "labels", "roads:nationalRoad"],
+                        "layout": {
+                            "text-pitch-alignment": "map",
+                            "text-rotation-alignment": "map",
+                            "text-allow-overlap": true,
+                            "text-field": "{name}",
+                            "text-font": ["Microsoft YaHei"],
+                            "text-size": {
+                                "base": 13,
+                                "stops": [
+                                    [16, 13],
+                                    [20, 14]
+                                ]
+                            }
+                        },
+                        "paint": {
+                            "text-color": "#92AACB",
+                            "text-halo-width": 0.1,
+                            "text-halo-color": ["string", ["get", "text_halo_color"]]
+                        },
+                        "minzoom":12
+                    },
+                    //国道-end
+                    //省道-start
+                    {
+                         "id": "city_normal_line_road_provincialRoad",
+                         "type": "line",
+                         "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                         "source-layer": "road",
+                         "layout": {
+                             "line-join": "bevel",
+                             "line-cap": "butt"
+                         },
+                         "paint": {
+                             "line-width": [
+                                 "number",
+                                 [
+                                     "get",
+                                     "width"
+                                 ]
+                             ],
+                             "line-color": "#54D5E3",
+                             "line-opacity": 1
+                         },
+                         "filter": ["in", "labels","roads:provincialRoad"],
+                         "minzoom":13
+                     },
+                    {
+                        "id": "city_normal_road_provincialRoad_label_id",
+                        "type": "symbol",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "road_label",
+                        "filter": ["in", "labels","roads:provincialRoad"],
+                        "layout": {
+                            "text-pitch-alignment": "map",
+                            "text-rotation-alignment": "map",
+                            "text-allow-overlap": true,
+                            "text-field": "{name}",
+                            "text-font": ["Microsoft YaHei"],
+                            "text-size": {
+                                "base": 13,
+                                "stops": [
+                                    [16, 13],
+                                    [20, 14]
+                                ]
+                            }
+                        },
+                        "paint": {
+                            "text-color": "#1E2127",
+                            "text-halo-width": 0.1,
+                            "text-halo-color": ["string", ["get", "text_halo_color"]]
+                        },
+                        "minzoom":13
+                    },
+                    //省道-end
+                    //二级公路-start
+                     {
+                         "id": "city_normal_line_road_secondaryRoad",
+                         "type": "line",
+                         "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                         "source-layer": "road",
+                         "layout": {
+                             "line-join": "bevel",
+                             "line-cap": "butt"
+                         },
+                         "paint": {
+                             "line-width": [
+                                 "number",
+                                 [
+                                     "get",
+                                     "width"
+                                 ]
+                             ],
+                             "line-color": "#599CF1",
+                             "line-opacity": 1
+                         },
+                         "filter": ["in", "labels","roads:secondaryRoad"],
+                         "minzoom":14
+                     },
+                    {
+                        "id": "city_normal_road_secondaryRoad_label_id",
+                        "type": "symbol",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "road_label",
+                        "filter": ["all", ["!=", "labels", "roads:secondaryRoad"],
+                            ["!=", "name", "↑"]
+                        ],
+                        "layout": {
+                            "text-pitch-alignment": "map",
+                            "text-rotation-alignment": "map",
+                            "text-allow-overlap": true,
+                            "text-field": "{name}",
+                            "text-font": ["Microsoft YaHei"],
+                            "text-size": {
+                                "base": 13,
+                                "stops": [
+                                    [16, 13],
+                                    [20, 14]
+                                ]
+                            }
+                        },
+                        "paint": {
+                            "text-color": "#92AACB",
+                            "text-halo-width": 0.1,
+                            "text-halo-color": ["string", ["get", "text_halo_color"]]
+                        },
+                        "minzoom":14
+                    },
+                    //二级公路-end
+                    //三级公路-start
+                     {
+                         "id": "city_normal_line_road_levelThreeRoad",
+                         "type": "line",
+                         "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                         "source-layer": "road",
+                         "layout": {
+                             "line-join": "bevel",
+                             "line-cap": "butt"
+                         },
+                         "paint": {
+                             "line-width": [
+                                 "number",
+                                 [
+                                     "get",
+                                     "width"
+                                 ]
+                             ],
+                             "line-color": "#353D5B",
+                             "line-opacity": 1
+                         },
+                         "filter": ["in", "labels","roads:levelThreeRoad"],
+                         "minzoom":15
+                     },
+                    {
+                        "id": "city_normal_road_levelThreeRoad_label_id",
+                        "type": "symbol",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "road_label",
+                        "filter": ["in", "labels","roads:levelThreeRoad"],
+                        "layout": {
+                            "text-pitch-alignment": "map",
+                            "text-rotation-alignment": "map",
+                            "text-allow-overlap": true,
+                            "text-field": "{name}",
+                            "text-font": ["Microsoft YaHei"],
+                            "text-size": {
+                                "base": 13,
+                                "stops": [
+                                    [16, 13],
+                                    [20, 14]
+                                ]
+                            }
+                        },
+                        "paint": {
+                            "text-color": "#385F9A",
+                            "text-halo-width": 0.1,
+                            "text-halo-color": ["string", ["get", "text_halo_color"]]
+                        },
+                        "minzoom":15
+                    },
+                    //三级公路-end
+                    //四级公路-stat
+                     {
+                         "id": "city_normal_line_road_levelFourRoad",
+                         "type": "line",
+                         "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                         "source-layer": "road",
+                         "layout": {
+                             "line-join": "bevel",
+                             "line-cap": "butt"
+                         },
+                         "paint": {
+                             "line-width": [
+                                 "number",
+                                 [
+                                     "get",
+                                     "width"
+                                 ]
+                             ],
+                             "line-color":"#072E5B",
+                             "line-opacity": 1
+                         },
+                         "filter": ["in", "labels","roads:levelFourRoad"],
+                         "minzoom":16
+                     },
+                    {
+                        "id": "city_normal_road_levelFourRoad_label_id",
+                        "type": "symbol",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "road_label",
+                        "filter": ["in", "labels","roads:levelFourRoad"],
+                        "layout": {
+                            "text-pitch-alignment": "map",
+                            "text-rotation-alignment": "map",
+                            "text-allow-overlap": true,
+                            "text-field": "{name}",
+                            "text-font": ["Microsoft YaHei"],
+                            "text-size": {
+                                "base": 13,
+                                "stops": [
+                                    [16, 13],
+                                    [20, 14]
+                                ]
+                            }
+                        },
+                        "paint": {
+                            "text-color": "#BBBDBE",
+                            "text-halo-width": 0.1,
+                            "text-halo-color": ["string", ["get", "text_halo_color"]]
+                        },
+                        "minzoom":16
+                    },
+                    //四级公路-end
+                    //高速公路-start
+                     {
+                         "id": "city_normal_line_road_highWay",
+                         "type": "line",
+                         "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                         "source-layer": "road",
+                         "layout": {
+                             "line-join": "bevel",
+                             "line-cap": "butt"
+                         },
+                         "paint": {
+                             "line-width": [
+                                 "number",
+                                 [
+                                     "get",
+                                     "width"
+                                 ]
+                             ],
+                             "line-color": "#769EDF",
+                             "line-opacity": 1
+                         },
+                         "filter": ["in", "labels", "roads:highWay"],
+                         "minzoom":12
+                    },
+                    {
+                        "id": "city_normal_line_road_highWay_label",
+                        "type": "symbol",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "road_label",
+                        "filter": ["in", "labels", "roads:highWay"],
+                        "layout": {
+                            "text-pitch-alignment": "map",
+                            "text-rotation-alignment": "map",
+                            "text-allow-overlap": true,
+                            "text-field": "{name}",
+                            "text-font": ["Microsoft YaHei"],
+                            "text-size": {
+                                "base": 13,
+                                "stops": [
+                                    [16, 13],
+                                    [20, 14]
+                                ]
+                            }
+                        },
+                        "paint": {
+                            "text-color": "#FFFFFF",//["string", ["get", "text_color"]],
+                            "text-halo-width": 0.1,
+                            "text-halo-color": ["string", ["get", "text_halo_color"]]
+                        },
+                        "minzoom":12
+                    },
+                    //高速公路-end
+                    //环路--start
+                    {
+                         "id": "city_normal_line_road_ringRoad",
+                         "type": "line",
+                         "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                         "source-layer": "road",
+                         "layout": {
+                             "line-join": "bevel",
+                             "line-cap": "butt"
+                         },
+                         "paint": {
+                             "line-width": [
+                                 "number",
+                                 [
+                                     "get",
+                                     "width"
+                                 ]
+                             ],
+                             "line-color": "#769EDF",
+                             "line-opacity": 1
+                         },
+                         "filter": ["in", "labels", "roads:ringRoad"],
+                         "minzoom":12
+                     },
+                    {
+                        "id": "city_normal_line_road_ringRoad_label",
+                        "type": "symbol",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "road_label",
+                        "filter": ["in", "labels", "roads:ringRoad"],
+                        "layout": {
+                            "text-pitch-alignment": "map",
+                            "text-rotation-alignment": "map",
+                            "text-allow-overlap": true,
+                            "text-field": "{name}",
+                            "text-font": ["Microsoft YaHei"],
+                            "text-size": {
+                                "base": 13,
+                                "stops": [
+                                    [16, 13],
+                                    [20, 14]
+                                ]
+                            }
+                        },
+                        "paint": {
+                            "text-color": "#BEC4CC",
+                            "text-halo-width": 0.1,
+                            "text-halo-color": ["string", ["get", "text_halo_color"]]
+                        },
+                        "minzoom":12
+                    },
+                    //环路--end
+                    //天桥
+                     {
+                         "id": "city_normal_line_overPass",
+                         "type": "line",
+                         "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                         "source-layer": "road",
+                         "layout": {
+                             "line-join": "bevel",
+                             "line-cap": "butt"
+                         },
+                         "paint": {
+                             "line-color": "#6A717C",
+                             "line-width": 12,
+                             "line-opacity": 1
+                         },
+                         "filter": ["==", "labels", "roads:overPass"],
+                          "minzoom":17
+                     },
+                     //地铁
+                    {
+                         "id": "city_normal_line_road_subway",
+                         "type": "line",
+                         "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                         "source-layer": "road",
+                         "layout": {
+                             "line-join": "bevel",
+                             "line-cap": "butt"
+                         },
+                         "paint": {
+                             "line-width": [
+                                 "number",
+                                 [
+                                     "get",
+                                     "width"
+                                 ]
+                             ],
+                             "line-color": "#BC6E6E",
+                             "line-opacity": 1
+                         },
+                         "filter": ["in", "labels","roads:subway"],
+                         "minzoom":14
+                     },
+                    //政府机构及社会团体
+                     {
+                         "id": "city_normal_poi_12",
+                         "type": "symbol",
+                         "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                         "source-layer": "poi",
+                         "layout": {
+                             "text-field": "{name}",
+                             "text-font": [
+                                 "Microsoft YaHei"
+                             ],
+                             "text-size": {
+                                 "base": 13,
+                                 "stops": [
+                                     [
+                                         16,
+                                         13
+                                     ],
+                                     [
+                                         20,
+                                         14
+                                     ]
+                                 ]
+                             },
+                             //"icon-image": "{icon-image}",
+                             "text-offset": [
+                                 0,
+                                 0.6
+                             ],
+                             "text-anchor": "top",
+                             "icon-size": 0.8
+                         },
+                         "paint": {
+                             "text-color":"#616C7C",
+                             /*"text-color": [
+                                 "string",
+                                 [
+                                     "get",
+                                     "text_color"
+                                 ]
+                             ],
+                             "text-halo-width": 1,
+                             "text-halo-color": [
+                                 "string",
+                                 [
+                                     "get",
+                                     "text_halo_color"
+                                 ]
+                             ]*/
+                         },
+                         "filter": [
+                             "all",
+                             [
+                                 "in",
+                                 "code",
+                                 "12"
+                             ],
+                             [
+                                 "!=",
+                                 "icon-image",
+                                 "24_360"
+                             ],
+                             [
+                                 "!=",
+                                 "icon-image",
+                                 "72_360"
+                             ]
+                         ],
+                         "minzoom":14
+                     },
+                    //科教文化
+                     {
+                         "id": "city_normal_poi_6",
+                         "type": "symbol",
+                         "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                         "source-layer": "poi",
+                         "layout": {
+                             "text-field": "{name}",
+                             "text-font": [
+                                 "Microsoft YaHei"
+                             ],
+                             "text-size": {
+                                 "base": 13,
+                                 "stops": [
+                                     [
+                                         16,
+                                         13
+                                     ],
+                                     [
+                                         20,
+                                         14
+                                     ]
+                                 ]
+                             },
+                             //"icon-image": "{icon-image}",
+                             "text-offset": [
+                                 0,
+                                 0.6
+                             ],
+                             "text-anchor": "top",
+                             "icon-size": 0.8
+                         },
+                         "paint": {
+                             "text-color":"#1999D0",
+                             /*"text-color": [
+                                 "string",
+                                 [
+                                     "get",
+                                     "text_color"
+                                 ]
+                             ],*/
+                             /*
+                             "text-halo-width": 1,
+                             "text-halo-color": [
+                                 "string",
+                                 [
+                                     "get",
+                                     "text_halo_color"
+                                 ]
+                             ]*/
+                         },
+                         "filter": [
+                             "all",
+                             [
+                                 "in",
+                                 "code",
+                                 "11"
+                             ],
+                             [
+                                 "!=",
+                                 "icon-image",
+                                 "24_360"
+                             ],
+                             [
+                                 "!=",
+                                 "icon-image",
+                                 "72_360"
+                             ]
+                         ],
+                         "minzoom":14
+                     },
+                    //风景名胜
+                     {
+                         "id": "city_normal_poi_3",
+                         "type": "symbol",
+                         "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                         "source-layer": "poi",
+                         "layout": {
+                             "text-field": "{name}",
+                             "text-font": [
+                                 "Microsoft YaHei"
+                             ],
+                             "text-size": {
+                                 "base": 13,
+                                 "stops": [
+                                     [
+                                         16,
+                                         13
+                                     ],
+                                     [
+                                         20,
+                                         14
+                                     ]
+                                 ]
+                             },
+                             //"icon-image": "{icon-image}",
+                             "text-offset": [
+                                 0,
+                                 0.6
+                             ],
+                             "text-anchor": "top",
+                             "icon-size": 0.8
+                         },
+                         "paint": {
+                             "text-color":"#3AC274"
+                             /*"text-color": [
+                                 "string",
+                                 [
+                                     "get",
+                                     "text_color"
+                                 ]
+                             ],
+                             "text-halo-width": 1,
+                             "text-halo-color": [
+                                 "string",
+                                 [
+                                     "get",
+                                     "text_halo_color"
+                                 ]
+                             ]*/
+                         },
+                         "filter": [
+                             "all",
+                             [
+                                 "in",
+                                 "code",
+                                 "11"
+                             ],
+                             [
+                                 "!=",
+                                 "icon-image",
+                                 "24_360"
+                             ],
+                             [
+                                 "!=",
+                                 "icon-image",
+                                 "72_360"
+                             ]
+                         ],
+                         "minzoom":15
+                     },
+                    //商务住宅
+                     {
+                         "id": "city_normal_poi_11",
+                         "type": "symbol",
+                         "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                         "source-layer": "poi",
+                         "layout": {
+                             "text-field": "{name}",
+                             "text-font": [
+                                 "Microsoft YaHei"
+                             ],
+                             "text-size": {
+                                 "base": 13,
+                                 "stops": [
+                                     [
+                                         16,
+                                         13
+                                     ],
+                                     [
+                                         20,
+                                         14
+                                     ]
+                                 ]
+                             },
+                             //"icon-image": "{icon-image}",
+                             "text-offset": [
+                                 0,
+                                 0.6
+                             ],
+                             "text-anchor": "top",
+                             "icon-size": 0.8
+                         },
+                         "paint": {
+                             "text-color": '#8CB0E3',
+                             // "text-halo-width": 1,
+                             "text-halo-color": [
+                                 "string",
+                                 [
+                                     "get",
+                                     "text_halo_color"
+                                 ]
+                             ]
+                         },
+                         "filter": [
+                             "all",
+                             [
+                                 "in",
+                                 "code",
+                                 "11"
+                             ],
+                             [
+                                 "!=",
+                                 "icon-image",
+                                 "24_360"
+                             ],
+                             [
+                                 "!=",
+                                 "icon-image",
+                                 "72_360"
+                             ]
+                         ],
+                         "minzoom":17
+                     },
+                    //地名
+                     {
+                         "id": "city_normal_poi_18",
+                         "type": "symbol",
+                         "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                         "source-layer": "poi",
+                         "layout": {
+                             "text-field": "{name}",
+                             "text-font": [
+                                 "Microsoft YaHei"
+                             ],
+                             "text-size": {
+                                 "base": 13,
+                                 "stops": [
+                                     [
+                                         16,
+                                         13
+                                     ],
+                                     [
+                                         20,
+                                         14
+                                     ]
+                                 ]
+                             },
+                             "icon-image": "{icon-image}",
+                             "text-offset": [
+                                 0,
+                                 0.6
+                             ],
+                             "text-anchor": "top",
+                             "icon-size": 0.8
+                         },
+                         "paint": {
+                             "text-color": "#98BDE3",
+                             // "text-halo-width": 1,
+                             "text-halo-color":"#98BDE3",
+                         },
+                         "filter": [
+                             "all",
+                             [
+                                 "in",
+                                 "code",
+                                 "18"
+                             ],
+                             [
+                                 "!=",
+                                 "icon-image",
+                                 "24_360"
+                             ],
+                             [
+                                 "!=",
+                                 "icon-image",
+                                 "72_360"
+                             ]
+                         ],
+                         "minzoom":17
+                     },
+                    {
+                        "id": "city_normal_building_id",
+                        "type": "fill-extrusion",
+                        "source": "438af1ba-dbe4-4838-8553-8f84e50859e0",
+                        "source-layer": "building",
+                        "layout": {},
+                        "paint": {
+                            "fill-extrusion-color": "#334873",
+                            "fill-extrusion-opacity": 0.8,
+                            "fill-extrusion-translate-anchor": "map",
+                            "fill-extrusion-height": 0,
+                            "fill-extrusion-base": 0,
+                            "fill-extrusion-vertical-gradient": true
+                        },
+                        "minzoom": 12
+                    }
+                ]
+            },
+            center: [116.5225882, 39.9392260],
+            minZoom:10,
+            maxZoom:18,
+            zoom: 11 // starting zoom
+        });
+
+
+        //一、全屏
+        map.addControl(new mapboxgl.FullscreenControl(), "top-left");
+
+        //二、放大缩小
+        map.addControl(new mapboxgl.NavigationControl(), "top-right");
+
+    };
+
+    create_grayMap();
+
+    // 地图默认叠加图层
+    function  add_default_layer(){
+        //遮盖
+        map.addLayer({
+            'id': 'fw0001',
+            'type': 'fill',
+            'source': 'fw',
+            'paint': {
+
+            }
+        });
+
+
+        map.addLayer({
+            'id': 'cyqJx_001',
+            'type': 'line',
+            'source': 'cyqJx',
+            'paint': {
+                'line-width':1,
+                // 'line-color':'#22f3fa',
+                'line-color':'rgba(34,243,250,0.5)',
+                // "line-dasharray": [2, 4]
+            }
+        });
+
+
+    };
+
+    map.on('load', function () {
+
+        map.addSource('jxm', {
+            'type': 'geojson',
+            'data':
+                '${base!}/examples/testdata/jxm_thematic2.geojson'
+        });
+
+        map.addSource('fw', {
+            'type': 'geojson',
+            'data':
+                '${base!}/examples/testdata/fw_difference.geojson'
+        });
+
+        map.addSource('cyqJx', {
+            'type': 'geojson',
+            'data':
+                'http://39.106.68.85:8080/cy/static/data/cyqJx.json'
+        });
+
+
+
+        add_default_layer();
+
+
+
+    });
+
+
+    map.on('moveend',function (e) {
+        //查询操作
+        console.log(map.getZoom());
+
+        $("#zoom-show").text(map.getZoom().toFixed(2));
+    });
+</script>
+
+</body>
+</html>

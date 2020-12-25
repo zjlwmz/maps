@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>文旅云-默认展示地图</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+
+    <script src="${base!}/static/plugins/jquery/jquery-1.8.2.min.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        #zoom-show{
+            position: absolute;
+            left: 6px;
+            bottom: 0px;
+            min-width: 36px;
+            height: 30px;
+            z-index: 1000;
+            background: white;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 5px;
+            padding: 0 10px;
+        }
+    </style>
+
+</head>
+<body>
+<div id="map"></div>
+<div id="zoom-show">11</div>
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiemhhbmdqaWFsdSIsImEiOiJjajRvOW44eDcwOGtqMzNxNnFvemQ2ZTlyIn0.i01rCdfpdvooSqkHQBxPBA';
+
+    var map;
+    //蓝黑地图
+    function create_grayMap(){
+        var baseMapStyle = getDataInfo("${base!}/static/style/base.json");
+        map = new mapboxgl.Map({
+            container: 'map', // container id
+            style:baseMapStyle,
+            center: [116.5225882, 39.9392260],
+            minZoom:10,
+            maxZoom:18,
+            zoom: 11 // starting zoom
+        });
+
+
+        //一、全屏
+        map.addControl(new mapboxgl.FullscreenControl(), "top-left");
+
+        //二、放大缩小
+        map.addControl(new mapboxgl.NavigationControl(), "top-right");
+
+    };
+
+    create_grayMap();
+
+    // 地图默认叠加图层
+    function  add_default_layer(){
+        //遮盖
+        map.addLayer({
+            'id': 'fw0001',
+            'type': 'fill',
+            'source': 'fw',
+            'paint': {
+
+            }
+        });
+
+
+        map.addLayer({
+            'id': 'cyqJx_001',
+            'type': 'line',
+            'source': 'cyqJx',
+            'paint': {
+                'line-width':1,
+                // 'line-color':'#22f3fa',
+                'line-color':'rgba(34,243,250,0.5)',
+                // "line-dasharray": [2, 4]
+            }
+        });
+
+
+    };
+
+    map.on('load', function () {
+
+        map.addSource('jxm', {
+            'type': 'geojson',
+            'data':
+                '${base!}/examples/testdata/jxm_thematic2.geojson'
+        });
+
+        map.addSource('fw', {
+            'type': 'geojson',
+            'data':
+                '${base!}/examples/testdata/fw_difference.geojson'
+        });
+
+        map.addSource('cyqJx', {
+            'type': 'geojson',
+            'data':
+                'http://39.106.68.85:8080/cy/static/data/cyqJx.json'
+        });
+
+
+
+        add_default_layer();
+
+
+
+    });
+
+
+    map.on('moveend',function (e) {
+        //查询操作
+        console.log(map.getZoom());
+
+        $("#zoom-show").text(map.getZoom().toFixed(2));
+    });
+
+    function getDataInfo (url, param, type) {
+        var $data = [];
+        $.ajax({
+            type: type || 'get',
+            url: url,
+            async: false,
+            data: param || {},
+            dataType: 'json',
+            success: function (data) {
+                $data = data;
+            }
+        });
+        return $data;
+    };
+</script>
+
+</body>
+</html>
