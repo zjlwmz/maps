@@ -10,6 +10,7 @@ var routeStartLayer=null,routeEndLayer=null;
 // 地图marker查询
 var searchMarkerLayer=null;
 
+var mapbox_popup;
 /**
  * 查询中
  */
@@ -38,9 +39,6 @@ function init() {
 
     //初始化地图
     initMap();
-
-    //添加地图基础底图数据
-    addBaiduBaseLayer();
 
     //查询天气
     findWeatherInfo();
@@ -112,143 +110,77 @@ function initMap(){
         $("#map").css("height",height+"px");
     });
 
-    map = L.map('map',{
-        inertia:true,
-        zoomAnimation:true,
-        zoomControl:false,
-        crs: L.CRS.Baidu,
-        minZoom:3
-    }).setView([39, 111], 4);
+    mapboxgl.accessToken = 'pk.eyJ1IjoiemhhbmdqaWFsdSIsImEiOiJjajRvOW44eDcwOGtqMzNxNnFvemQ2ZTlyIn0.i01rCdfpdvooSqkHQBxPBA';
 
-    var zoomControl = L.control.zoom({
-        position: 'bottomright',
-        zoomInTitle:"放大",
-        zoomOutTitle:"缩小"
+    map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        // style: 'mapbox://styles/mapbox/dark-v10',
+        center: [116.1975213,39.8435551],
+        minZoom:3,
+        maxZoom:18,
+        zoom: 4
     });
-    map.addControl(zoomControl);
+
+    //一、全屏
+    map.addControl(new mapboxgl.FullscreenControl(), "top-right");
+
+    //二、放大缩小
+    map.addControl(new mapboxgl.NavigationControl(), "top-right");
 
 
-    L.control.mousePosition().addTo(map);
-
-    /**
-     * 比例尺
-     */
-    L.control.scale().addTo(map);
+    map.setPitch(45.5);//视角
+    map.setBearing(0);//轴承|旋转
 
 
-    locationLayer = L.layerGroup([]).addTo(map);
-    lineLayer = L.layerGroup([]).addTo(map);
 
-    routeStartLayer =L.layerGroup([]).addTo(map);
-    routeEndLayer =L.layerGroup([]).addTo(map);
-
-    searchMarkerLayer= L.layerGroup([]).addTo(map);
-
-    //地图图形开始创建
-    map.on("click", function (event) {
-        $("#tips").hide();
-        //关键字查询
-        if(inputType == 0){
-            searchMarkerLayer.clearLayers();
-            var latlng=event.latlng;
-            var marker=L.marker(latlng);
-            searchMarkerLayer.addLayer(marker);
-            var html=[];
-
-            //GCJ-02 坐标系
-            var gcjLonlat = GPS.bd_decrypt(latlng.lat, latlng.lng);
-
-            //wgs84坐标
-            var wgs84Lonlat = GPS.gcj_decrypt(gcjLonlat.lat, gcjLonlat.lon);
-
-
-            var loadingUrl = baseUrl+"/static/images/icon/loading.gif";
-            html.push("<div class='popup'>");
-            html.push("<div class='point gcj'>谷歌地图："+gcjLonlat.lat.toFixed(7)+","+gcjLonlat.lon.toFixed(7)+"</div>");
-            html.push("<div class='point'>百度地图："+latlng.lat.toFixed(7)+","+latlng.lng.toFixed(7)+"</div>");
-            html.push("<div class='point wg84'>谷歌地球："+wgs84Lonlat.lat.toFixed(7)+","+wgs84Lonlat.lon.toFixed(7)+"</div>");
-            html.push("<div>地址：<span class='popup-address' data-x='"+gcjLonlat.lon+"' data-y='"+gcjLonlat.lat+"'><img src='"+loadingUrl+"' /></span></div>");
-            html.push("<div>");
-            var htmlStr=html.join("");
-            marker.bindPopup(htmlStr).openPopup();
-        }
-        //导航
-        else if(inputType == 1){
-            var latlng=event.latlng;
-            var marker=L.marker(latlng);
-
-            var location=latlng.lng+","+latlng.lat;
-            MapServerUtils.amap.regeo(location,function(data){
-                if(data.infocode=="10000"){
-                    var formatted_address = data.regeocode.formatted_address;
-                    var addressComponent = data.regeocode.addressComponent;
-                    var city = addressComponent.city;
-                    if(city.length==0){
-                        city = addressComponent.province;
-                    }
-
-                    //起点
-                    if(!$("#startLocation").data().address){
-                        $("#startLocation").val(formatted_address);
-                        $("#startLocation").data({
-                            city:city,
-                            address:formatted_address,
-                            latlng:latlng
-                        }).parent().find(".input-clear").show();
-                        $("#endLocation").focus();
-
-                        routeStartLayer.addLayer(marker);
-
-                    }else if(!$("#endLocation").data().address){
-                        $("#endLocation").val(formatted_address);
-                        $("#endLocation").data({
-                            city:city,
-                            address:formatted_address,
-                            latlng:latlng
-                        }).parent().find(".input-clear").show();
-
-                        routeEndLayer.addLayer(marker);
-                    }
-
-                    //导航查询
-                    if($("#startLocation").data().address && $("#endLocation").data().address){
-                        directionSearch();
-                    }
-                }
-            });
-        }
+    map.on('load', function () {
 
     });
 
-    //popup 打开事件
-    map.on("popupopen",function(){
-        var data=$(".popup-address").data();
-        if(null!=data && null!=data.x && null!=data.y){
-            findXyByAddress(data.x+","+data.y,function(data){
-                var formatted_address = data.formatted_address;
-                $(".popup-address").empty().append(formatted_address);
-            });
-        }
+
+    mapbox_popup = new mapboxgl.Popup({
+        closeButton: false
     });
 
-};
+    var pointMarker;
+    map.on('click', function (event) {
+        console.log(event);
+        if(pointMarker)pointMarker.remove();
+        if(mapbox_popup)mapbox_popup.remove();
 
-/**
- * 自定义样式地图，customid可选值：dark,midnight,grayscale,hardedge,light,redalert,googlelite,grassgreen,pink,darkgreen,bluish
- * 添加百度地图
- */
-function addBaiduBaseLayer(){
-    //控制地图底图
-    baiduLayerControl=L.control.layers({
-        "百度地图": L.tileLayer.baidu({ layer: 'vec' }).addTo(map),
-        "百度卫星": L.tileLayer.baidu({ layer: 'img' }),
-        "百度地图-大字体": L.tileLayer.baidu({ layer: 'vec', bigfont: true }),
-        "百度卫星-大字体": L.tileLayer.baidu({ layer: 'img', bigfont: true }),
-        "自定义样式-黑色地图": L.tileLayer.baidu({ layer: 'custom', customid: 'dark' }),
-        "自定义样式-蓝色地图": L.tileLayer.baidu({ layer: 'custom', customid: 'midnight' })
-    }, {
-        "实时交通信息": L.tileLayer.baidu({ layer: 'time' })
-    }, { position: "topright" }).addTo(map);
+        mapbox_popup = new mapboxgl.Popup({ closeOnClick: false })
+            .setLngLat(event.lngLat)
+            .setHTML('<h1>Hello World!</h1>')
+            .addTo(map);
+
+
+        // create the popup
+        // var popup = new mapboxgl.Popup({ offset: 25 }).setText(
+        //     'Construction on the Washington Monument began in 1848.'
+        // );
+
+        // create DOM element for the marker
+        var el = document.createElement('div');
+        el.id = 'marker';
+
+        // create the marker
+        pointMarker = new mapboxgl.Marker(el)
+            .setLngLat(event.lngLat)
+            //.setPopup(mapbox_popup) // sets a popup on this marker
+            .addTo(map);
+
+        //
+        // mapbox_popup
+        //     .setLngLat(event.lngLat)
+        //     .setText('zjl001')
+        //     .addTo(map);
+
+
+        debugger;
+
+    });
+
 };
 
 /**

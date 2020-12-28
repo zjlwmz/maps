@@ -301,11 +301,11 @@ function addMapBaseLayer(){
 
 	//高德街道(带标注)
 	var gaoDeUrl="http://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}";
-	var gaoDeMap= L.tileLayer(gaoDeUrl, {id: 'appmaptile.light', attribution: "高德街道(带标注)",subdomains:[0,1,2,3]});
+	var gaoDeMap= L.tileLayer(gaoDeUrl, {id: 'appmaptile.light', attribution: "高德街道(带标注)",subdomains:[1,2,3]});
 
 	//高德街道(无标注)
 	var gaoDeUrl2="https://wprd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}&scl=1&ltype=3";
-	var gaoDeMapNo= L.tileLayer(gaoDeUrl2, {id: 'appmaptile.light', attribution: "高德街道无标注",subdomains:[0,1,2,3]});
+	var gaoDeMapNo= L.tileLayer(gaoDeUrl2, {id: 'appmaptile.light', attribution: "高德街道无标注",subdomains:[1,2,3]});
 
 	//高德卫星
 	var gaoDe_SatelliteUrl="http://webst03.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}";
