@@ -1,3 +1,11 @@
+#默认 街道面、绿地、陆地、水系
+12：高速道路、城市环线、国道、
+13：省道、铁路、高铁、
+14：二级道路、地铁、政府结构
+15、三级道路、风景名胜、
+16、四级道路、科技文化、
+17、商务住房、天桥、地道、地名、
+
 #道路 （10） minzoom": 10
 roads:highSpeedRailway=高铁 （14）
 roads:highWay=高速公路10
@@ -7,6 +15,8 @@ roads:provincialRoad=省道 13
 roads:secondaryRoad=二级公路
 roads:levelThreeRoad=三级公路
 roads:levelFourRoad=四级公路
+roads:railway=铁路
+roads:subway=地铁
 roads:overPass=天桥
 roads:guideBoards=路牌
 

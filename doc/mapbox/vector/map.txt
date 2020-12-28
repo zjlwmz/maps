@@ -8,6 +8,8 @@ roads:provincialRoad=省道
 roads:secondaryRoad=二级公路
 roads:levelThreeRoad=三级公路
 roads:levelFourRoad=四级公路
+roads:railway=铁路
+roads:subway=地铁
 roads:overPass=天桥
 roads:guideBoards=路牌
 

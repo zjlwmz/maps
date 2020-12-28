@@ -10,12 +10,15 @@ var ioc = {
 		events:{
 			depose:"close"
 		},
-		fields:{
+		fields: {
 			maxWait: 15000, // 若不配置此项,如果数据库未启动,druid会一直等可用连接,卡住启动过程
-			defaultAutoCommit : false, // 提高fastInsert的性能
+			defaultAutoCommit: false, // 提高fastInsert的性能
 			url: "jdbc:postgresql://localhost:5432/dmap",
-            username: "postgres",
-            password: "post"
+			username: "postgres",
+			password: "post"
+			// url: "jdbc:postgresql://39.106.68.85:5432/g-map",
+			// username: "postgres",
+			// password: "postykbzjl918"
 		}
 	},
 	dao : {

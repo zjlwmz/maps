@@ -101,6 +101,18 @@ public class HomeController {
 		return null;
 	}
 
+
+	/**
+	 * 地图-mapbox
+	 * @return
+	 */
+	@At(value="mapbox")
+	@Ok("beetl:/public/mapbox.html")
+	public Object mapbox(){
+		return null;
+	}
+
+
 	
 	/**
 	 * postgis操作
