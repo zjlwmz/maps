@@ -1,0 +1,16 @@
+#截图框架
+https://github.com/geolonia/mbgl-export-control
+说明：
+
+1. 需要安装canvas-toBlob和file-saver，前者用于转换地图的canvas，后者用于把blob存储为图片；
+mapbox-gl 是使用的地图库，如果基于ol或minemap的地图应用，引入相应的库即可
+2. 截图的主要原理：
+a.通过参数获取当前的map对象，得到div大小，地图的图层信息，地图状态的center、zoom、pitch和bearing等
+b.新建一个和map对象容器一样大的div，在该div中创建新的地图对象，添加和原map对象一样的图层，设置相同的地图状态
+注意，该新的div需要设置为隐藏状态，即 visibility: 'hidden'
+c.获取新的地图对象的canvas，另存为图片
+
+/Users/zhangjialu/IdeaProjects/maps/WebRoot/WEB-INF/views/public/examples/screenshot/index.html
+
+
+http://localhost:8080/maps/example/index?name=public/examples/screenshot/index

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Display a map</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.0.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.0.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    </style>
+    <script src="${base!}/static/plugins/FileSaver/FileSaver.js"></script>
+    <script src="${base!}/static/plugins/canvas-toBlob/canvas-toBlob.js"></script>
+    <script src="${base!}/static/plugins/screenshot/icons.js"></script>
+    <script src="${base!}/static/plugins/screenshot/ExportControl.js"></script>
+    <script src="${base!}/static/plugins/jquery/jquery-1.8.2.min.js"></script>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiemhhbmdqaWFsdSIsImEiOiJjajRvOW44eDcwOGtqMzNxNnFvemQ2ZTlyIn0.i01rCdfpdvooSqkHQBxPBA';
+    $(document).ready(function(){
+        var map = new mapboxgl.Map({
+            container: 'map', // container id
+            style: 'mapbox://styles/mapbox/streets-v11', // style URL
+            center: [116.3923627, 39.9097115], // starting position [lng, lat]
+            zoom: 9 // starting zoom
+        });
+
+        // Add the control to download png.
+        map.addControl(new ExportControl());
+
+
+
+        map.on('load', function () {
+            map.addSource('maine', {
+                'type': 'geojson',
+                'data': {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [
+                                    116.37062072753906,
+                                    39.882342585755744
+                                ],
+                                [
+                                    116.35551452636717,
+                                    39.86916866504292
+                                ],
+                                [
+                                    116.35139465332031,
+                                    39.854937988531276
+                                ],
+                                [
+                                    116.42486572265625,
+                                    39.83754093169162
+                                ],
+                                [
+                                    116.52992248535155,
+                                    39.841231584845
+                                ],
+                                [
+                                    116.54571533203124,
+                                    39.87707332113241
+                                ],
+                                [
+                                    116.54022216796875,
+                                    39.932380403490875
+                                ],
+                                [
+                                    116.40838623046876,
+                                    39.98027708862265
+                                ],
+                                [
+                                    116.37062072753906,
+                                    39.882342585755744
+                                ]
+                            ]
+                        ]
+                    }
+                }
+            });
+            map.addLayer({
+                'id': 'maine',
+                'type': 'fill',
+                'source': 'maine',
+                'layout': {},
+                'paint': {
+                    'fill-color': '#088',
+                    'fill-opacity': 0.8
+                }
+            });
+        });
+
+
+    });
+
+</script>
+
+</body>
+</html>
