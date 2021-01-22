@@ -229,6 +229,8 @@ function initMap(){
 
 /**
  * 添加地图基础图层
+ *
+ * //https://www.earthol.com/
  */
 function addMapBaseLayer(){
 	//google 矢量地图
