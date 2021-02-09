@@ -1,0 +1,184 @@
+<html>
+
+<head>
+    <title>US County-to-County Migration</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src="https://unpkg.com/deck.gl@latest/dist.min.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.0/d3.min.js"></script>
+    <style type="text/css">
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+</head>
+
+<body>
+</body>
+<script type="text/javascript">
+    mapboxgl.accessToken = 'pk.eyJ1IjoicnNiYXVtYW5uIiwiYSI6ImNqNmhkZnhkZDA4M3Yyd3AwZDR4cmdhcDIifQ.TGKKAC6pPP0L-uMDJ5xFAA';
+
+    // Layers and functionsI need from deck.gl Mapbox class
+    var { MapboxLayer, ArcLayer, ScatterplotLayer } = deck;
+
+    // Data for arcs
+    var DATA_URL = 'https://raw.githubusercontent.com/uber-common/deck.gl-data/master/examples/arc/counties.json';
+
+    // migrate out - red
+    var SOURCE_COLOR = [166, 3, 3];
+    // migrate in - blue
+    var TARGET_COLOR = [35, 181, 184];
+
+    var RADIUS_SCALE = d3.scaleSqrt().domain([0, 8000]).range([1000, 20000]);
+    var WIDTH_SCALE = d3.scaleLinear().domain([0, 1000]).range([1, 4]);
+
+    //Create the Mapbox map
+    var map = new mapboxgl.Map({
+        container: document.body,
+        style: 'mapbox://styles/mapbox/light-v10?optimize=true',
+        center: [-100, 40.7],
+        zoom: 3,
+        pitch: 35,
+        antialias: true
+    });
+
+    var countiesLayer;
+    var arcsLayer;
+
+    // Load the data and layers once Mapbox map style loads
+    map.on('style.load', () => {
+        d3.json(DATA_URL).then(loadData);
+    });
+
+    //Enable arc brushing on mousemove event from Mapbox
+    map.on('mousemove', ({ point }) => {
+        if (arcsLayer) {
+            arcsLayer.setProps({ mousePosition: [point.x, point.y] });
+        }
+    });
+
+    function renderLayers({ arcs, counties }) {
+        countiesLayer = new MapboxLayer({
+            type: ScatterplotLayer,
+            id: 'counties',
+            data: counties,
+            opacity: 1,
+            pickable: true,
+            antialiase: true,
+            // onHover: this._onHover,
+            getRadius: d => RADIUS_SCALE(d.total),
+            getColor: d => (d.net > 0 ? TARGET_COLOR : SOURCE_COLOR)
+        });
+
+        arcsLayer = new MapboxLayer({
+            type: ArcBrushingLayer,
+            id: 'arcs',
+            data: arcs,
+            brushRadius: 100000,
+            getStrokeWidth: d => WIDTH_SCALE(d.value),
+            opacity: 1,
+            antialias: true,
+            getSourcePosition: d => d.source,
+            getTargetPosition: d => d.target,
+            getSourceColor: SOURCE_COLOR,
+            getTargetColor: TARGET_COLOR
+        });
+
+        map.addLayer(countiesLayer, 'waterway-label');
+        map.addLayer(arcsLayer, 'waterway-label');
+    }
+
+    //Load and process data for visualization
+    function loadData(data) {
+        var arcs = [];
+        var counties = [];
+        var pairs = {};
+
+        data.features.forEach((county, i) => {
+            var { flows, centroid: targetCentroid } = county.properties;
+            var value = { gain: 0, loss: 0 };
+
+            Object.keys(flows).forEach(toId => {
+                value[flows[toId] > 0 ? 'gain' : 'loss'] += flows[toId];
+
+                var pairKey = i < toId ? `${i}-${toId}` : `${toId}-${i}`;
+                var sourceCentroid = data.features[toId].properties.centroid;
+                var gain = Math.sign(flows[toId]);
+
+                // eliminate duplicates arcs
+                if (pairs[pairKey]) {
+                    return;
+                }
+
+                pairs[pairKey] = true;
+
+                arcs.push({
+                    target: gain > 0 ? targetCentroid : sourceCentroid,
+                    source: gain > 0 ? sourceCentroid : targetCentroid,
+                    value: Math.abs(flows[toId])
+                });
+            });
+
+            // add point at arc target
+
+            counties.push({
+                gain: value.gain,
+                loss: value.loss,
+                position: targetCentroid,
+                net: value.gain + value.loss,
+                total: value.gain - value.loss,
+                name: county.properties.name
+            });
+        });
+
+        // sort counties by radius large -> small
+        counties.sort((a, b) => Math.abs(b.net) - Math.abs(a.net));
+
+        renderLayers({ arcs, counties });
+    }
+
+    // Create the brushing effect on the layer in deck.gl
+    // See https://github.com/uber/deck.gl/blob/master/docs/get-started/interactivity.md
+    class ArcBrushingLayer extends ArcLayer {
+        getShaders() {
+            // use customized shaders
+            return Object.assign({}, super.getShaders(), {
+                inject: {
+                    'vs:#decl': `
+  uniform vec2 mousePosition;
+  uniform float brushRadius;
+              `,
+                    'vs:#main-end': `
+  float brushRadiusPixels = project_scale(brushRadius);
+
+  vec2 sourcePosition = project_position(instancePositions.xy);
+  bool isSourceInBrush = distance(sourcePosition, mousePosition) <= brushRadiusPixels;
+
+  vec2 targetPosition = project_position(instancePositions.zw);
+  bool isTargetInBrush = distance(targetPosition, mousePosition) <= brushRadiusPixels;
+
+  if (!isSourceInBrush && !isTargetInBrush) {
+    vColor.a = 0.0;
+  }
+              `,
+                    'fs:#main-start': `
+  if (vColor.a == 0.0) discard;
+              `
+                }
+            });
+        }
+
+        draw(opts) {
+            var { brushRadius = 1e6, mousePosition } = this.props;
+            // add uniforms
+            var uniforms = Object.assign({}, opts.uniforms, {
+                brushRadius: brushRadius,
+                mousePosition: mousePosition ?
+                    this.projectPosition(this.unproject(mousePosition)).slice(0, 2) : [0, 0]
+            });
+            super.draw(Object.assign({}, opts, { uniforms }));
+        }
+    }
+</script>
+
+</html>
